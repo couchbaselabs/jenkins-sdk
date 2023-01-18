@@ -23,7 +23,8 @@ class BuildDockerCppPerformer {
         imp.dirAbsolute(path) {
             imp.dir('transactions-fit-performer') {
                 imp.dir('performers/cpp') {
-                    writeCppShaFile(imp, sdkVersion, sha)
+                    imp.execute("git submodule update --init --recursive")
+                    checkoutCppVersion(imp, path, sdkVersion, sha)
                     sdkVersion.ifPresent(v -> {
                         TagProcessor.processTags(new File(imp.currentDir()), ImplementationVersion.from(v), false)
                     })
@@ -35,23 +36,26 @@ class BuildDockerCppPerformer {
         }
     }
 
-    private static void writeCppShaFile(Environment imp, Optional<String> sdkVersion, Optional<String> sha) {
-        def file = new File("${imp.currentDir()}/cb_version.txt")
 
-        sha.ifPresentOrElse(
-            (shaValue) -> {
-                file.write(shaValue)
-            },
-            () -> {
-                sdkVersion.ifPresentOrElse(
-                        (versionValue) -> {
-                            file.write("tags/${versionValue}")
-                        },
-                        () -> {
-                            file.write("main")
-                        }
+    private static void checkoutCppVersion(Environment imp, String path, Optional<String> sdkVersion, Optional<String> sha) {
+        imp.dirAbsolute(path) {
+            imp.dir('transactions-fit-performer/performers/cpp/couchbase-cxx-client') {
+                sha.ifPresentOrElse(
+                    (shaValue) -> {
+                        imp.execute("git checkout ${shaValue}")
+                    },
+                    () -> {
+                        sdkVersion.ifPresentOrElse(
+                            (versionValue) -> {
+                                imp.execute("git checkout tags/${versionValue}")
+                            },
+                            () -> {
+                                imp.execute("git checkout main")
+                            }
+                        )
+                    }
                 )
             }
-        )
+        }
     }
 }
