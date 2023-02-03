@@ -13,14 +13,27 @@ class CppVersions {
     }
 
     @Memoized
-    static String getLatestSnapshotLabel(String version) {
-        def json = NetworkUtil.readJson("https://api.github.com/repos/couchbaselabs/couchbase-cxx-client/commits/main")
-        String sha = json.sha
-        String commitDate = json.commit.committer.date
-        String[] parts = commitDate.split("T")
-        String date = parts[0].replaceAll("[^0-9]", "")
-        String time = parts[1].replaceAll("[^0-9]", "")
-        return version + "-" + date + "." + time + "-" + sha.substring(0, 7)
+    static String getLatestSnapshotLabel() {
+        def releases = getAllReleases()
+        def closestRelease = null
+        def minNonNegativeAheadBy = Integer.MAX_VALUE
+
+        for (release in releases) {
+            def compareJson = NetworkUtil.readJson("https://api.github.com/repos/couchbaselabs/couchbase-cxx-client/compare/${release}...main")
+            int aheadBy = compareJson.ahead_by
+            if (aheadBy >= 0 && aheadBy < minNonNegativeAheadBy) {
+                minNonNegativeAheadBy = aheadBy
+                closestRelease = release
+            }
+        }
+
+        if (minNonNegativeAheadBy == 0) {
+            return closestRelease.toString();
+        } else {
+            def commitJson = NetworkUtil.readJson("https://api.github.com/repos/couchbaselabs/couchbase-cxx-client/commits/main")
+            String sha = commitJson.sha
+            return "${closestRelease}+${minNonNegativeAheadBy}.${sha.substring(0, 7)}"
+        }
     }
 
     @Memoized
@@ -39,5 +52,9 @@ class CppVersions {
         }
 
         return out
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getLatestSnapshotLabel());
     }
 }
