@@ -116,6 +116,7 @@ class TagProcessor {
                 var lines = file.readLines()
                 boolean needsOverwriting = false
                 boolean skipMode = false
+                boolean removedOpenComment = false
 
                 for (int i = 0; i < lines.size(); i++) {
                     var line = lines.get(i)
@@ -123,6 +124,12 @@ class TagProcessor {
                     boolean isEnd = line.contains(commentMarker + " [end:")
                     boolean isSkip = line.contains(commentMarker + " [skip:")
                     boolean isSkipped = line.startsWith(commentMarker + " [skipped]")
+
+                    boolean csprojSkip = false
+                    if (isCsproj && removedOpenComment && line == "-->"){
+                        csprojSkip = true
+                        removedOpenComment = false
+                    }
 
                     if (skipMode) {
                         needsOverwriting = true
@@ -177,25 +184,31 @@ class TagProcessor {
                                     out.add(line)
                                 } else {
                                     out.add(line)
-                                // Trimming the marker for the startsWith() check because in Python it needs to have leading whitespace
-                                boolean includedAlready = isLastLine || !lines.get(i + 1).trim().startsWith(marker.trim())
-                                // logger.info("May need to modify ${file.getAbsolutePath()} ${versionRaw} include=${include} includedAlready=${includedAlready}")
-                                if (include && !includedAlready) {
-                                    // Skip over the /*, e.g. don't include it in the output
-                                    needsOverwriting = true
-                                    i += 1
+
+                                    // Trimming the marker for the startsWith() check because in Python it needs to have leading whitespace
+                                    boolean includedAlready = isLastLine || !lines.get(i + 1).trim().startsWith(marker.trim())
+                                    // logger.info("May need to modify ${file.getAbsolutePath()} ${versionRaw} include=${include} includedAlready=${includedAlready}")
+                                    if (include && !includedAlready) {
+                                        // Skip over the /*, e.g. don't include it in the output
+                                        needsOverwriting = true
+                                        i += 1
+                                        if (isCsproj){
+                                            removedOpenComment = true
+                                        }
+                                    }
+                                    if (!include && includedAlready) {
+                                        needsOverwriting = true
+                                        out.add(marker)
+                                    }
                                 }
-                                if (!include && includedAlready) {
-                                    needsOverwriting = true
-                                    out.add(marker)
-                                }
-                            }
                             } else { // isSkip
                                 skipMode = !restoreMode && match
                                 out.add(line)
                             }
                         } else {
-                            out.add(line)
+                            if (!csprojSkip) {
+                                out.add(line)
+                            }
                         }
                     }
                 }
