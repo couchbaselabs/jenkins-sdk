@@ -49,10 +49,10 @@ class TagProcessor {
 
     @CompileStatic
     static boolean match(String s, ImplementationVersion sdkVersion) {
-        boolean isLessThan = s.contains("<")
+        boolean isLessThan = s.contains(":<")
         String versionRaw
         if (isLessThan) {
-            versionRaw = s.split("<")[1].split("]")[0]
+            versionRaw = s.split(":<")[1].split("]")[0]
         } else {
             versionRaw = s.split(":")[1].split("]")[0]
         }
@@ -98,12 +98,18 @@ class TagProcessor {
             if (file.isFile()) {
                 logger.info("Processing any tags in file ${file.getAbsolutePath()}")
 
-                boolean isPython = file.toString().endsWith(".py")
-                boolean isRuby = file.toString().endsWith(".rb")
+                String filename = file.toString()
+
+                boolean isPython = filename.endsWith(".py")
+                boolean isRuby = filename.endsWith(".rb")
+                boolean isCsproj = filename.endsWith(".csproj")
 
                 var commentMarker = "//"
                 if (isPython || isRuby) {
                     commentMarker = "#"
+                }
+                if (isCsproj){
+                    commentMarker = "<!--"
                 }
 
                 var out = new ArrayList<>()
@@ -149,7 +155,14 @@ class TagProcessor {
                                     } else {
                                         marker = "=end"
                                     }
-                                } else {
+                                } else if (isCsproj) {
+                                    if (isStart){
+                                        marker = "<!--"
+                                    } else {
+                                        marker = "-->"
+                                    }
+                                }
+                                else {
                                     if (isStart) {
                                         marker = "/*"
                                     } else {
@@ -157,7 +170,13 @@ class TagProcessor {
                                     }
                                 }
 
-                                out.add(line)
+                                if (isCsproj && isEnd){
+                                    if (!match) {
+                                        out.add(marker)
+                                    }
+                                    out.add(line)
+                                } else {
+                                    out.add(line)
                                 // Trimming the marker for the startsWith() check because in Python it needs to have leading whitespace
                                 boolean includedAlready = isLastLine || !lines.get(i + 1).trim().startsWith(marker.trim())
                                 // logger.info("May need to modify ${file.getAbsolutePath()} ${versionRaw} include=${include} includedAlready=${includedAlready}")
@@ -170,6 +189,7 @@ class TagProcessor {
                                     needsOverwriting = true
                                     out.add(marker)
                                 }
+                            }
                             } else { // isSkip
                                 skipMode = !restoreMode && match
                                 out.add(line)
