@@ -46,13 +46,14 @@ import java.util.logging.SimpleFormatter
  */
 class TagProcessor {
     private static Logger logger = Logger.getLogger("")
+    private static boolean isCsproj = false;
 
     @CompileStatic
     static boolean match(String s, ImplementationVersion sdkVersion) {
-        boolean isLessThan = s.contains(":<")
+        boolean isLessThan = s.contains("<")
         String versionRaw
         if (isLessThan) {
-            versionRaw = s.split(":<")[1].split("]")[0]
+            versionRaw = s.split("<")[1].split("]")[0]
         } else {
             versionRaw = s.split(":")[1].split("]")[0]
         }
@@ -66,6 +67,9 @@ class TagProcessor {
 
         ImplementationVersion sdkVersion = (build as HasVersion).implementationVersion() as ImplementationVersion
 
+        if (isCsproj) {
+            line = line.trim()[4..-4]
+        }
         if (line.contains("&&")) {
             var split = line.split("&&")
             return match(split[0], sdkVersion) && match(split[1], sdkVersion)
@@ -75,8 +79,8 @@ class TagProcessor {
     }
 
     /**
-     * @param curPath    a directory to recursively run the tags processing on all files below
-     * @param build      what to build
+     * @param curPath a directory to recursively run the tags processing on all files below
+     * @param build what to build
      */
     @CompileStatic
     public static void processTags(File curPath, VersionToBuild build, boolean restoreMode = false) {
@@ -102,13 +106,13 @@ class TagProcessor {
 
                 boolean isPython = filename.endsWith(".py")
                 boolean isRuby = filename.endsWith(".rb")
-                boolean isCsproj = filename.endsWith(".csproj")
-
+                isCsproj = filename.endsWith(".csproj")
+                
                 var commentMarker = "//"
                 if (isPython || isRuby) {
                     commentMarker = "#"
                 }
-                if (isCsproj){
+                if (isCsproj) {
                     commentMarker = "<!--"
                 }
 
@@ -116,7 +120,10 @@ class TagProcessor {
                 var lines = file.readLines()
                 boolean needsOverwriting = false
                 boolean skipMode = false
+                
+                //If a previous line skipped writing a "<!--", don't write the closing marker "-->".
                 boolean removedOpenComment = false
+                boolean csprojSkip
 
                 for (int i = 0; i < lines.size(); i++) {
                     var line = lines.get(i)
@@ -125,8 +132,8 @@ class TagProcessor {
                     boolean isSkip = line.contains(commentMarker + " [skip:")
                     boolean isSkipped = line.startsWith(commentMarker + " [skipped]")
 
-                    boolean csprojSkip = false
-                    if (isCsproj && removedOpenComment && line == "-->"){
+                    csprojSkip = false
+                    if (isCsproj && removedOpenComment && line.trim() == "-->") {
                         csprojSkip = true
                         removedOpenComment = false
                     }
@@ -163,13 +170,12 @@ class TagProcessor {
                                         marker = "=end"
                                     }
                                 } else if (isCsproj) {
-                                    if (isStart){
+                                    if (isStart) {
                                         marker = "<!--"
                                     } else {
                                         marker = "-->"
                                     }
-                                }
-                                else {
+                                } else {
                                     if (isStart) {
                                         marker = "/*"
                                     } else {
@@ -177,7 +183,8 @@ class TagProcessor {
                                     }
                                 }
 
-                                if (isCsproj && isEnd){
+                                //The XML closing tag needs to be added before the [end:X.X.X]
+                                if (isCsproj && isEnd) {
                                     if (!match) {
                                         out.add(marker)
                                     }
@@ -192,7 +199,7 @@ class TagProcessor {
                                         // Skip over the /*, e.g. don't include it in the output
                                         needsOverwriting = true
                                         i += 1
-                                        if (isCsproj){
+                                        if (isCsproj) {
                                             removedOpenComment = true
                                         }
                                     }
