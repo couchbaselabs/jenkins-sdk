@@ -123,7 +123,7 @@ class Execute {
                     def allReleases = CppVersions.getAllReleases()
                     def highest = ImplementationVersion.highest(allReleases)
                     ctx.env.log("Found latest sha for C++: ${sha}")
-                    String version = highest.toString() + "-" + sha
+                    String version = CppVersions.formatSnapshotVersion(highest, sha)
                     implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("-").last(), true))
                 }
                 else if (implementation.language == "Ruby") {
