@@ -27,7 +27,8 @@ class GithubVersions {
         String time = parts[1].replaceAll("[^0-9]", "")
         // Why 7 characters here but 6 characters in getLatestSha?  Because it was in the code that's being refactored
         // here.  It's probably not strictly necessary, but keeping it so the SDK Performance results remain consistent.
-        return date + "." + time + "-" + sha.substring(0, 7)
+        // Use '+' to append the SHA, to treat it as build metadata that's ignored in semver sorting.
+        return date + "." + time + "+" + sha.substring(0, 7)
     }
 
     static String parseLinkHeaderForNext(URLConnection connection) {

@@ -43,4 +43,13 @@ class Versions {
         def allVersions = JVMVersions.getAllJVMReleases(client)
         return versions(env, implementation, client, allVersions)
     }
+
+    static String appendPreReleaseIdentifierToVersion(String version, String identifier)
+    {
+        if (version.contains('-')) {
+            return version + "." + identifier
+        } else {
+            return version + "-" + identifier
+        }
+    }
 }

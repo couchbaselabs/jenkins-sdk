@@ -19,6 +19,10 @@ class CppVersions {
         return withoutUnsupportedVersions(out)
     }
 
+    static String formatSnapshotVersion(ImplementationVersion version, String sha) {
+        return Versions.appendPreReleaseIdentifierToVersion(version.toString(), sha)
+    }
+
     /**
      * Removes the versions that are not supported by the C++ Performer. Currently the unsupported versions are
      * all 1.0.0-beta.X releases and 1.0.0-dp.X releases where X < 10
