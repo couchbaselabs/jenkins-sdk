@@ -107,7 +107,7 @@ class Execute {
                     def allReleases = PythonVersions.getAllReleases()
                     def highest = ImplementationVersion.highest(allReleases)
                     ctx.env.log("Found latest sha for Python: ${sha}")
-                    String version = highest.toString() + "-" + sha
+                    String version = PythonVersions.formatSnapshotVersion(highest, sha)
                     implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("-").last(), true))
                 }
                 else if (implementation.language == "Node") {
@@ -123,7 +123,7 @@ class Execute {
                     def allReleases = CppVersions.getAllReleases()
                     def highest = ImplementationVersion.highest(allReleases)
                     ctx.env.log("Found latest sha for C++: ${sha}")
-                    String version = highest.toString() + "-" + sha
+                    String version = CppVersions.formatSnapshotVersion(highest, sha)
                     implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("-").last(), true))
                 }
                 else if (implementation.language == "Ruby") {
@@ -131,7 +131,7 @@ class Execute {
                     def allReleases = RubyVersions.getAllReleases()
                     def highest = ImplementationVersion.highest(allReleases)
                     ctx.env.log("Found latest sha for Ruby: ${sha}")
-                    String version = highest.toString() + "-" + sha
+                    String version = RubyVersions.formatSnapshotVersion(highest, sha)
                     implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("-").last(), true))
                 }
                 else {

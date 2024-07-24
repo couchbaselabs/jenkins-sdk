@@ -17,4 +17,8 @@ class RubyVersions {
     static Set<ImplementationVersion> getAllReleases() {
         return GithubVersions.getAllReleases(REPO)
     }
+
+    static String formatSnapshotVersion(ImplementationVersion version, String sha) {
+        return Versions.appendPreReleaseIdentifierToVersion(version.toString(), sha)
+    }
 }
