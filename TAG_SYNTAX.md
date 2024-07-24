@@ -5,9 +5,7 @@ An example from the Java performer, where an expiry() overload was added in vers
 // [if:3.0.7]
 out.expiry(Instant.ofEpochSecond(opts.getExpiry().getAbsoluteEpochSecs()));
 // [else]
-throw new UnsupportedOperationException(
-    "This SDK version does not support absolute expiry"
-);
+//? throw new UnsupportedOperationException("Absolute expiry not supported");
 // [end]
 ```
 
@@ -51,7 +49,7 @@ someCodeThatRequiresThisVersionRange()
 
 ## Tag descriptions
 
-The tag processor ignores any text on the same line as an `if`, `else`, or `end` tag. 
+The tag processor ignores any text on the same line as an `if`, `else`, or `end` tag.
 You can take advantage of this to annotate your tags with a human-readable description.
 For example:
 ```
@@ -75,7 +73,7 @@ return new Foo();
 ```
 
 In that example, if the SDK version is >= `1.2.3` the preprocessor doesn't change the behavior of this code.
-If the SDK version is < `1.2.3` the preprocessor comments out `return new Foo();` and un-comments `return null;` 
+If the SDK version is < `1.2.3` the preprocessor comments out `return new Foo();` and un-comments `return null;`
 
 Conditional comments may be used inside `if` and `else` tags.
 It is a syntax error for a conditional comment to appear anywhere else.
