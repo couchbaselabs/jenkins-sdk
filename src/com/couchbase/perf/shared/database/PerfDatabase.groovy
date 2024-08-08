@@ -67,7 +67,7 @@ class PerfDatabase {
         execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_situational_run_join_situational_run_id ON situational_run_join (situational_run_id)")
         // JSONB indexes
         execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_runs_params ON runs USING gin (params)")
-        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_runs_events_params ON run_events USING gin (params")
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_runs_events_params ON run_events USING gin (params)")
     }
 
     /**
