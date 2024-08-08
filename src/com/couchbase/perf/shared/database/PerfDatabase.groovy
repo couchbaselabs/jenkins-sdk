@@ -57,17 +57,17 @@ class PerfDatabase {
         execute(sql, env, "ALTER TABLE situational_runs ALTER COLUMN datetime TYPE TIMESTAMPTZ")
 
         // Indexes
-        execute(sql, env, "CREATE INDEX idx_buckets_run_id ON buckets (run_id)")
-        execute(sql, env, "CREATE INDEX idx_metrics_run_id ON metrics (run_id)")
-        execute(sql, env, "CREATE INDEX idx_run_events_run_id ON run_events (run_id)")
-        execute(sql, env, "CREATE INDEX idx_buckets_time_offset_secs ON buckets (time_offset_secs)")
-        execute(sql, env, "CREATE INDEX idx_metrics_time_offset_secs ON metrics (time_offset_secs)")
-        execute(sql, env, "CREATE INDEX idx_buckets_run_id_time_offset_secs ON buckets (run_id, time_offset_secs)")
-        execute(sql, env, "CREATE INDEX idx_situational_run_join_run_id ON situational_run_join (run_id)")
-        execute(sql, env, "CREATE INDEX idx_situational_run_join_situational_run_id ON situational_run_join (situational_run_id)")
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_buckets_run_id ON buckets (run_id)")
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_metrics_run_id ON metrics (run_id)")
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_run_events_run_id ON run_events (run_id)")
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_buckets_time_offset_secs ON buckets (time_offset_secs)")
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_metrics_time_offset_secs ON metrics (time_offset_secs)")
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_buckets_run_id_time_offset_secs ON buckets (run_id, time_offset_secs)")
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_situational_run_join_run_id ON situational_run_join (run_id)")
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_situational_run_join_situational_run_id ON situational_run_join (situational_run_id)")
         // JSONB indexes
-        execute(sql, env, "CREATE INDEX idx_runs_params ON runs USING gin (params)")
-        execute(sql, env, "CREATE INDEX idx_runs_events_params ON run_events USING gin (params")
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_runs_params ON runs USING gin (params)")
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_runs_events_params ON run_events USING gin (params")
     }
 
     /**
