@@ -109,9 +109,8 @@ class BuildPerformer {
                     versions = Versions.jvmVersions(env, implementation, "kotlin-client")
                     break
                 case Sdk.JAVA_COLUMNAR:
-                    def implementation = new PerfConfig.Implementation("Java-Columnar", "1.X.0", null)
-                    versions = Versions.jvmVersions(env, implementation, "java-columnar-client")
-                    break
+                    def implementation = new PerfConfig.Implementation("Columnar-Java", "1.X.0", null)
+                    versions = Versions.jvmVersions(env, implementation, "columnar-java-client")
                 case Sdk.GO:
                     // 2.3.0 is earliest supported
                     def target = ImplementationVersion.from("2.3.0")
