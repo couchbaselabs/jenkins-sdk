@@ -108,7 +108,7 @@ class Execute {
                     def highest = ImplementationVersion.highest(allReleases)
                     ctx.env.log("Found latest sha for Python: ${sha}")
                     String version = PythonVersions.formatSnapshotVersion(highest, sha)
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("-").last(), true))
+                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("\\+").last(), true))
                 }
                 else if (implementation.language == "Node") {
                     def sha = NodeVersions.getLatestSha()
@@ -124,7 +124,7 @@ class Execute {
                     def highest = ImplementationVersion.highest(allReleases)
                     ctx.env.log("Found latest sha for C++: ${sha}")
                     String version = CppVersions.formatSnapshotVersion(highest, sha)
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("-").last(), true))
+                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("\\+").last(), true))
                 }
                 else if (implementation.language == "Ruby") {
                     def sha = RubyVersions.getLatestSha()
@@ -132,7 +132,7 @@ class Execute {
                     def highest = ImplementationVersion.highest(allReleases)
                     ctx.env.log("Found latest sha for Ruby: ${sha}")
                     String version = RubyVersions.formatSnapshotVersion(highest, sha)
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("-").last(), true))
+                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("\\+").last(), true))
                 }
                 else {
                     throw new UnsupportedOperationException("Cannot support snapshot builds with language ${implementation.language} yet")
