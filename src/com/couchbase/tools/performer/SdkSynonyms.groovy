@@ -74,7 +74,7 @@ class SdkSynonyms {
     }
 
     public static boolean isJavaCol(String input) {
-        return input.equalsIgnoreCase("java-columnar")
+        return input.equalsIgnoreCase("columnar-java")
     }
 
 
