@@ -11,7 +11,9 @@ enum Sdk {
     NODE,
     GO,
     PHP,
-    JAVA_COLUMNAR
+    JAVA_COLUMNAR,
+    NODE_COLUMNAR,
+    PYTHON_COLUMNAR
 }
 
 class SdkSynonyms {
@@ -27,6 +29,8 @@ class SdkSynonyms {
         else if (isGo(input)) return Sdk.GO
         else if (isPHP(input)) return Sdk.PHP
         else if (isJavaCol(input)) return Sdk.JAVA_COLUMNAR
+        else if (isNodeCol(input)) return Sdk.NODE_COLUMNAR
+        else if (isPythonCol(input)) return Sdk.PYTHON_COLUMNAR
         else throw new RuntimeException("Cannot parse SDK ${input}")
     }
 
@@ -75,6 +79,14 @@ class SdkSynonyms {
 
     public static boolean isJavaCol(String input) {
         return input.equalsIgnoreCase("columnar-java")
+    }
+
+    public static boolean isNodeCol(String input) {
+        return input.equalsIgnoreCase("columnar-node")
+    }
+
+    public static boolean isPythonCol(String input) {
+        return input.equalsIgnoreCase("columnar-python")
     }
 
 
