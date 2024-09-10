@@ -158,6 +158,14 @@ class BuildPerformer {
                     // Otherwise nothing will match until 3.5.0 release
                     versions.add(target)
                     break
+                case Sdk.NODE_COLUMNAR:
+                    def implementation = new PerfConfig.Implementation("Columnar-Node", "1.X.0", null)
+                    versions = Versions.versions(env, implementation, "columnar-node")
+                    break
+                case Sdk.PYTHON_COLUMNAR:
+                    def implementation = new PerfConfig.Implementation("Columnar-Python", "1.X.0", null)
+                    versions = Versions.versions(env, implementation, "columnar-python")
+                    break
             }
 
             env.log("Got ${versions.size()} versions")
@@ -189,6 +197,10 @@ class BuildPerformer {
                     BuildDockerDotNetPerformer.build(env, dir, vers, imageName, onlySource)
                 } else if (sdk == Sdk.NODE) {
                     BuildDockerNodePerformer.build(env, dir, vers, imageName, onlySource)
+                } else if (sdk == Sdk.NODE_COLUMNAR) {
+                    BuildDockerColumnarNodePerformer.build(env, dir, vers, imageName, onlySource)
+                }else if (sdk == Sdk.PYTHON_COLUMNAR) {
+                    BuildDockerColumnarPythonPerformer.build(env, dir, vers, imageName, onlySource)
                 } else {
                     logger.severe("Do not yet know how to build " + sdkRaw)
                 }
