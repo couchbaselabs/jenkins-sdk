@@ -26,17 +26,15 @@ class BuildDockerColumnarPythonPerformer {
         }
 
         imp.dirAbsolute(path) {
-            imp.dir('transactions-fit-performer') {
-                imp.dir('performers/columnar/python') {
-                    writePythonRequirementsFile(imp, build)
-                    TagProcessor.processTags(new File(imp.currentDir()), build, Optional.of(Pattern.compile(".*\\.py")))
-                }
+            imp.dir('transactions-fit-performer/performers/columnar/python') {
+                writePythonRequirementsFile(imp, build)
+                TagProcessor.processTags(new File(imp.currentDir()), build, Optional.of(Pattern.compile(".*\\.py")))
+            }
 
-                def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
+            def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
 
-                if (!onlySource) {
-                    imp.execute("docker build -f ./performers/python/Dockerfile -t $imageName $serializedBuildArgs .", false, true, true)
-                }
+            if (!onlySource) {
+                imp.execute("docker build -f ./transactions-fit-performer/performers/columnar/python/Dockerfile -t $imageName $serializedBuildArgs .", false, true, true)
             }
         }
     }
