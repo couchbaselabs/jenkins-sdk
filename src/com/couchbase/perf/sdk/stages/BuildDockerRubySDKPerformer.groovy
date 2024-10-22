@@ -12,7 +12,8 @@ class BuildDockerRubySDKPerformer extends Stage {
     final String imageName
 
     static String genImageName(String sdkVersion) {
-        return "performer-ruby" + sdkVersion
+        // Docker image names cannot contain '+'
+        return "performer-ruby" + sdkVersion.replace('+', '-')
     }
 
     BuildDockerRubySDKPerformer(String sdkVersion, String sha) {
