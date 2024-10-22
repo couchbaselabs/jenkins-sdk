@@ -12,7 +12,7 @@ class BuildDockerPythonSDKPerformer extends Stage {
     final String imageName
 
     static String genImageName(String sdkVersion) {
-        return "performer-python" + sdkVersion
+        return "performer-python" + sdkVersion.replace('+', '-')
     }
 
     BuildDockerPythonSDKPerformer(String sdkVersion, String sha) {

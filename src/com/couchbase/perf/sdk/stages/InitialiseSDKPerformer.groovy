@@ -92,6 +92,5 @@ class InitialiseSDKPerformer extends Stage {
         }
 
         return stages
-
     }
 }

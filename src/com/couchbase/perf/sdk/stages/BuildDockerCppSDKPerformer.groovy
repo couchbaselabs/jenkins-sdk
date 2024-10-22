@@ -14,7 +14,7 @@ class BuildDockerCppSDKPerformer extends Stage {
     final String imageName
 
     static String genImageName(String sdkVersion) {
-        return "performer-cpp" + sdkVersion
+        return "performer-cpp" + sdkVersion.replace('+', '-')
     }
 
     BuildDockerCppSDKPerformer(String sdkVersion, String sha) {
