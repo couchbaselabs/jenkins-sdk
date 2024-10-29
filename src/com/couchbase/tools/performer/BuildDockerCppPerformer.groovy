@@ -27,10 +27,6 @@ class BuildDockerCppPerformer {
 
         imp.dirAbsolute(path) {
             imp.dir('transactions-fit-performer') {
-                imp.dir('performers/cpp') {
-                    TagProcessor.processTags(new File(imp.currentDir()), build)
-                }
-
                 def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
 
                 if (!onlySource) {
