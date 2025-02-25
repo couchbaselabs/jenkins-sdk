@@ -1,6 +1,6 @@
 servers:
   performer: localhost
-  driver: {hostname: localhost, source: /Users/ronith.jaju/Documents}
+  driver: {hostname: localhost, source: /Users/ronith.jaju/Documents/faasTrial}
 database: {hostname: localhost, hostname_docker: timedb, port: 5432, username: postgres,
   password: password, database: perf}
 environment: {executables: null, envvar: null, workspace: workspace}
@@ -13,17 +13,32 @@ matrix:
     connection_string_driver_docker: 'couchbase://cbs', connection_string_performer_docker: 'couchbase://cbs',
     hostname_rest_docker: 'http://cbs:8091', storage: couchstore, replicas: 0}
   implementations:
-  - {language: C++, version: snapshot}
+  - {language: Python, version: snapshot}
+  - {language: Scala, version: snapshot}
   workloads:
   - operations:
-    - op: insert
+    - op: get
       bounds: {forSeconds: $forSeconds}
-      docLocation: {method: uuid}
+      docLocation: {method: pool, poolSize: $poolSize, poolSelectionStrategy: randomUniform}
     settings:
       variables:
-      - {name: docNum, value: 10000000}
+      - {name: poolSize, value: 10000}
     exclude:
-    - {protostellar: true}
+    - {gerrit: true}
+  - operations:
+    - op: get
+      bounds: {forSeconds: $forSeconds}
+      docLocation: {method: pool, poolSize: $poolSize, poolSelectionStrategy: randomUniform}
+    settings:
+      variables:
+      - {name: poolSize, value: 10000}
+      - name: horizontalScaling
+        values: [1, 2, 4, 8, 16, 32]
+      - name: experimentName
+        values: [horizontalScaling]
+    include:
+    - {version: snapshot}
+    exclude:
     - {gerrit: true}
 settings:
   grpc: {flowControl: true, batch: 1000, compression: true}
@@ -38,4 +53,4 @@ settings:
     value: multiprocessing
     include:
     - implementation: {language: Python}
-projectId: fa046b6b-b370-41df-9d6a-be897dcd4a74
+projectId: 06214fef-8880-4be8-955b-2413a2d423f2

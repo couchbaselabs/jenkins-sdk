@@ -68,6 +68,25 @@ class PerfDatabase {
         // JSONB indexes
         execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_runs_params ON runs USING gin (params)")
         execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_runs_events_params ON run_events USING gin (params)")
+        // New Projects table to hold an overlying project for grouping runs
+        execute(sql, env, "CREATE TABLE IF NOT EXISTS projects ("
+                + "id uuid PRIMARY KEY, "
+                + "datetime timestamp NOT NULL DEFAULT now(), "
+                + "name TEXT, "
+                + "description TEXT DEFAULT NULL, "
+                + "tags TEXT[] DEFAULT NULL, "
+                + "config jsonb"
+                + ")");
+        // Join table to link projects with runs
+        execute(sql, env, "CREATE TABLE IF NOT EXISTS project_runs ("
+                + "project_id UUID REFERENCES projects(id) ON DELETE CASCADE, "
+                + "run_id UUID REFERENCES runs(id) ON DELETE CASCADE, "
+                + "PRIMARY KEY (project_id, run_id)"
+                + ")");
+        // Indexes for the new tables
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_project_runs_project_id ON project_runs (project_id)");
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_project_runs_run_id ON project_runs (run_id)");
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_projects_datetime ON projects (datetime)");    
     }
 
     /**
