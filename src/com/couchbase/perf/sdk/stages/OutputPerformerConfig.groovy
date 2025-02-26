@@ -98,7 +98,7 @@ class OutputPerformerConfig extends Stage {
             }
             runs runsAsYaml
             settings topLevelSettings
-            projectId ctx.jc.projectId
+            jobId ctx.jc.jobId
         }
 
         def converted = YamlConverter.convertJsonToYaml(new StringReader(json.toString()))

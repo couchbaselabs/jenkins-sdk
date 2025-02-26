@@ -68,25 +68,24 @@ class PerfDatabase {
         // JSONB indexes
         execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_runs_params ON runs USING gin (params)")
         execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_runs_events_params ON run_events USING gin (params)")
-        // New Projects table to hold an overlying project for grouping runs
-        execute(sql, env, "CREATE TABLE IF NOT EXISTS projects ("
+        // New Jobs table to hold an overlying job for grouping runs
+        execute(sql, env, "CREATE TABLE IF NOT EXISTS jobs ("
                 + "id uuid PRIMARY KEY, "
                 + "datetime timestamp NOT NULL DEFAULT now(), "
-                + "name TEXT, "
-                + "description TEXT DEFAULT NULL, "
-                + "tags TEXT[] DEFAULT NULL, "
-                + "config jsonb"
+                + "config jsonb, "
+                + "tags TEXT[] DEFAULT NULL"
                 + ")");
-        // Join table to link projects with runs
-        execute(sql, env, "CREATE TABLE IF NOT EXISTS project_runs ("
-                + "project_id UUID REFERENCES projects(id) ON DELETE CASCADE, "
+        // Join table to link jobs with runs
+        execute(sql, env, "CREATE TABLE IF NOT EXISTS job_runs ("
+                + "job_id UUID REFERENCES jobs(id) ON DELETE CASCADE, "
                 + "run_id UUID REFERENCES runs(id) ON DELETE CASCADE, "
-                + "PRIMARY KEY (project_id, run_id)"
+                + "PRIMARY KEY (job_id, run_id)"
                 + ")");
         // Indexes for the new tables
-        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_project_runs_project_id ON project_runs (project_id)");
-        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_project_runs_run_id ON project_runs (run_id)");
-        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_projects_datetime ON projects (datetime)");    
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_jobs_datetime ON jobs (datetime)");
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_jobs_tags ON jobs USING gin (tags)");  
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_job_runs_job_id ON job_runs (job_id)");
+        execute(sql, env, "CREATE INDEX IF NOT EXISTS idx_job_runs_run_id ON job_runs (run_id)"); 
     }
 
     /**

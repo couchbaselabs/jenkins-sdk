@@ -319,8 +319,8 @@ class Execute {
 
 
     static void execute(String[] args) {
-        // Generate a unique projectId
-        String projectId = UUID.randomUUID().toString();
+        // Generate a unique jobId
+        String jobId = UUID.randomUUID().toString();
 
         // Load the existing job-config.yaml
         Yaml yaml = new Yaml(new Constructor(Map.class), new Representer(), new DumperOptions());
@@ -334,8 +334,8 @@ class Execute {
             return;
         }
 
-        // Insert the projectId
-        config.put("projectId", projectId);
+        // Insert the jobId
+        config.put("jobId", jobId);
 
         // Save the updated job-config.yaml
         try (Writer writer = new FileWriter(configFile)) {
@@ -383,12 +383,13 @@ class Execute {
         }
         try {
             def sql = PerfDatabase.getConnection(jdbc, jc.database.username, dbPassword)
+            def configJson = new groovy.json.JsonBuilder([name: "Project Name", description: "Project Description"]).toString()
 
-            sql.executeUpdate("""
-                INSERT INTO projects (id, datetime, name) 
-                VALUES (${UUID.fromString(projectId)}, NOW(), 'Project Name')
+            sql.execute("""
+                INSERT INTO jobs (id, datetime, config, tags) 
+                VALUES (?, NOW(), ?::jsonb, ?::text[])
                 ON CONFLICT (id) DO NOTHING
-            """)
+            """, [UUID.fromString(jobId), configJson, ["tag1", "tag2"] as String[]]) // Convert list to array
 
             root.execute(ctx)
         } finally {
