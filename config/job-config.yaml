@@ -131,6 +131,12 @@ matrix:
       version: 3.4.X
 
     - language: .NET
+      version: 3.5.X
+
+    - language: .NET
+      version: 3.6.X
+
+    - language: .NET
       version: snapshot
 
     # Earliest version the Go performer can compile is 2.3.0 (possibly earlier)
