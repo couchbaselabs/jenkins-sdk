@@ -192,6 +192,9 @@ matrix:
     - language: Node
       version: 4.3.X
 
+    - language: Node
+      version: 4.4.X
+
     - language: Ruby
       version: 3.4.X
 
