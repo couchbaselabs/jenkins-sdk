@@ -17,8 +17,8 @@ class DotNetVersions {
     static Set<ImplementationVersion> getAllReleases() {
         var allVersions = GithubVersions.getAllReleases(REPO)
         var skipVersions = [
-                new ImplementationVersion(3, 4, 10, "rc1"),
-                new ImplementationVersion(3, 4, 5, "rc2")
+                new ImplementationVersion(3, 4, 10, "-rc1"),
+                new ImplementationVersion(3, 4, 5, "-rc2")
         ]
         return allVersions.findAll {it -> !skipVersions.contains(it) }
     }
