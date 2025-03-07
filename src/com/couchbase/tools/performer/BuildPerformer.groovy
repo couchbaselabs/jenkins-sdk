@@ -68,7 +68,7 @@ class BuildPerformer {
 
         Map<String, String> dockerBuildArgs = new HashMap<>()
         if (options.a) {
-            if (!(sdk in [Sdk.CPP, Sdk.PYTHON, Sdk.RUBY])) {
+            if (!(sdk in [Sdk.CPP, Sdk.PYTHON, Sdk.RUBY, Sdk.GO, Sdk.GO_COLUMNAR])) {
                 logger.severe("The docker-build-args parameter cannot be set for the ${sdk.name()} SDK.")
                 System.exit(-1)
             }
