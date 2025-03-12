@@ -1,6 +1,7 @@
 package com.couchbase.tools.performer
 
 import com.couchbase.context.environments.Environment
+import com.couchbase.tools.network.NetworkUtil
 import com.couchbase.tools.tags.TagProcessor
 import groovy.transform.CompileStatic
 
@@ -37,7 +38,10 @@ class BuildDockerGoPerformer {
                     dockerBuildArgs.put(VERSION_ARG, "v${build.version()}".toString())
                 }
                 else if (build instanceof BuildMain) {
-                    dockerBuildArgs.put(VERSION_ARG, "master")
+                    // If we set SDK_VERSION to "master", docker might cache the result of an earlier go get command result.
+                    // This means we could end up using an outdated version of master. We should fetch the latest commit SHA here and provide that to prevent this.
+                    def json = NetworkUtil.readJson("https://proxy.golang.org/github.com/couchbase/gocb/v2/@v/master.info")
+                    dockerBuildArgs.put(VERSION_ARG, json["Origin"]["Hash"] as String)
                 }
 
 
