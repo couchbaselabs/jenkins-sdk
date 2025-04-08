@@ -86,7 +86,11 @@ class InitialiseSDKPerformer extends Stage {
         }
 
         if (ctx.performerServer == "localhost") {
-            stages.add(new StartDockerImagePerformer(imageName, CONTAINER_NAME, port, impl.version()))
+            if (impl.language == "C++") {
+                stages.add(new StartDockerImageCppSDKPerformer(imageName, CONTAINER_NAME, port, impl.version()))
+            } else {
+                stages.add(new StartDockerImagePerformer(imageName, CONTAINER_NAME, port, impl.version()))
+            }
         } else {
             throw new IllegalArgumentException("Cannot handle running on performer remote server")
         }

@@ -331,8 +331,9 @@ matrix:
       include:
         - language: Java
           version: snapshot
-        - language: C++
-          version: snapshot
+        # Remove C++ from transactino read load until CXXCBC-678 (double free crash) is fixed 
+        # - language: C++
+        #   version: snapshot
         - language: Go
           version: snapshot
       exclude:
