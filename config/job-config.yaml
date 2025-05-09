@@ -166,6 +166,9 @@ matrix:
       version: 2.9.X
 
     - language: Go
+      version: 2.10.X
+
+    - language: Go
       version: snapshot
 
     - language: Python
