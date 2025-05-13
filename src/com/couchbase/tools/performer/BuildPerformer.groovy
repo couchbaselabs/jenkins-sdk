@@ -208,7 +208,9 @@ class BuildPerformer {
                     BuildDockerColumnarPythonPerformer.build(env, dir, vers, imageName, onlySource)
                 }else if (sdk == Sdk.GO_COLUMNAR) {
                     BuildDockerColumnarGoPerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
-                } else {
+                }else if (sdk == Sdk.GO_ANALYTICS) {
+                     BuildDockerAnalyticsGoPerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
+                 } else {
                     logger.severe("Do not yet know how to build " + sdkRaw)
                 }
             }
