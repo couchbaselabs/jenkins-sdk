@@ -14,7 +14,8 @@ enum Sdk {
     JAVA_COLUMNAR,
     NODE_COLUMNAR,
     PYTHON_COLUMNAR,
-    GO_COLUMNAR
+    GO_COLUMNAR,
+    GO_ANALYTICS
 }
 
 class SdkSynonyms {
@@ -33,6 +34,7 @@ class SdkSynonyms {
         else if (isNodeCol(input)) return Sdk.NODE_COLUMNAR
         else if (isPythonCol(input)) return Sdk.PYTHON_COLUMNAR
         else if (isGoCol(input)) return Sdk.GO_COLUMNAR
+        else if (isGoAna(input)) return Sdk.GO_ANALYTICS
         else throw new RuntimeException("Cannot parse SDK ${input}")
     }
 
@@ -93,6 +95,10 @@ class SdkSynonyms {
 
     public static boolean isGoCol(String input) {
         return input.equalsIgnoreCase("columnar-go")
+    }
+
+    public static boolean isGoAna(String input) {
+        return input.equalsIgnoreCase("analytics-go")
     }
 
 
