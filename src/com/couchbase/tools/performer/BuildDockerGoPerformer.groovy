@@ -44,7 +44,7 @@ class BuildDockerGoPerformer {
                 def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
 
                 if (!onlySource) {
-                    imp.execute("docker build -f performers/go/Dockerfile --platform=linux/amd64 $serializedBuildArgs -t $imageName .", false, true, true)
+                    imp.execute("docker build -f performers/go/Dockerfile $serializedBuildArgs -t $imageName .", false, true, true)
                 }
             }
         }
