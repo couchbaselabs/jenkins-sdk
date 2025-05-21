@@ -12,9 +12,11 @@ enum Sdk {
     GO,
     PHP,
     JAVA_COLUMNAR,
+    JAVA_ANALYTICS,
     NODE_COLUMNAR,
     PYTHON_COLUMNAR,
-    GO_COLUMNAR
+    GO_COLUMNAR,
+    GO_ANALYTICS
 }
 
 class SdkSynonyms {
@@ -29,10 +31,12 @@ class SdkSynonyms {
         else if (isNode(input)) return Sdk.NODE
         else if (isGo(input)) return Sdk.GO
         else if (isPHP(input)) return Sdk.PHP
-        else if (isJavaCol(input)) return Sdk.JAVA_COLUMNAR
-        else if (isNodeCol(input)) return Sdk.NODE_COLUMNAR
-        else if (isPythonCol(input)) return Sdk.PYTHON_COLUMNAR
-        else if (isGoCol(input)) return Sdk.GO_COLUMNAR
+        else if (isJavaColumnar(input)) return Sdk.JAVA_COLUMNAR
+        else if (isJavaAnalytics(input)) return Sdk.JAVA_ANALYTICS
+        else if (isNodeColumnar(input)) return Sdk.NODE_COLUMNAR
+        else if (isPythonColumnar(input)) return Sdk.PYTHON_COLUMNAR
+        else if (isGoColumnar(input)) return Sdk.GO_COLUMNAR
+        else if (isGoAnalytics(input)) return Sdk.GO_ANALYTICS
         else throw new RuntimeException("Cannot parse SDK ${input}")
     }
 
@@ -79,20 +83,28 @@ class SdkSynonyms {
         return input.equalsIgnoreCase("php")
     }
 
-    public static boolean isJavaCol(String input) {
+    public static boolean isJavaColumnar(String input) {
         return input.equalsIgnoreCase("columnar-java")
     }
 
-    public static boolean isNodeCol(String input) {
+    public static boolean isJavaAnalytics(String input) {
+        return input.equalsIgnoreCase("analytics-java")
+    }
+
+    public static boolean isNodeColumnar(String input) {
         return input.equalsIgnoreCase("columnar-node")
     }
 
-    public static boolean isPythonCol(String input) {
+    public static boolean isPythonColumnar(String input) {
         return input.equalsIgnoreCase("columnar-python")
     }
 
-    public static boolean isGoCol(String input) {
+    public static boolean isGoColumnar(String input) {
         return input.equalsIgnoreCase("columnar-go")
+    }
+
+    public static boolean isGoAnalytics(String input) {
+        return input.equalsIgnoreCase("analytics-go")
     }
 
 

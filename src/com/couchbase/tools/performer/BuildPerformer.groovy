@@ -68,7 +68,7 @@ class BuildPerformer {
 
         Map<String, String> dockerBuildArgs = new HashMap<>()
         if (options.a) {
-            if (!(sdk in [Sdk.CPP, Sdk.PYTHON, Sdk.RUBY])) {
+            if (!(sdk in [Sdk.CPP, Sdk.PYTHON, Sdk.RUBY, Sdk.GO, Sdk.GO_COLUMNAR])) {
                 logger.severe("The docker-build-args parameter cannot be set for the ${sdk.name()} SDK.")
                 System.exit(-1)
             }
@@ -144,12 +144,8 @@ class BuildPerformer {
                 case Sdk.DOTNET:
                     // 3.3.0 is earliest supported
                     def target = ImplementationVersion.from("3.3.0")
-                    def skipVersions = [
-                            new ImplementationVersion(3, 4, 10, "rc1"),
-                            new ImplementationVersion(3, 4, 5, "rc2")
-                    ]
                     def vers = DotNetVersions.allReleases
-                            .findAll { (it.isAbove(target) || it.equals(target)) && !skipVersions.contains(it)}
+                            .findAll { it.isAbove(target) || it.equals(target) }
                     def implementation = new PerfConfig.Implementation(".NET", "3.X.0", null)
                     versions = Versions.versions(env, implementation, ".NET", vers)
                     break
@@ -194,6 +190,8 @@ class BuildPerformer {
             try {
                 if (sdk == Sdk.JAVA || sdk == Sdk.KOTLIN || sdk == Sdk.SCALA || sdk == Sdk.JAVA_COLUMNAR) {
                     BuildDockerJVMPerformer.build(env, dir, sdkRaw.replace("-sdk", ""), vers, imageName, onlySource)
+                } else if (sdk == Sdk.JAVA_ANALYTICS) {
+                    BuildDockerAnalyticsJvmPerformer.build(env, dir, "java", vers, imageName, onlySource)
                 } else if (sdk == Sdk.GO) {
                     BuildDockerGoPerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
                 } else if (sdk == Sdk.PYTHON) {
@@ -208,10 +206,12 @@ class BuildPerformer {
                     BuildDockerNodePerformer.build(env, dir, vers, imageName, onlySource)
                 } else if (sdk == Sdk.NODE_COLUMNAR) {
                     BuildDockerColumnarNodePerformer.build(env, dir, vers, imageName, onlySource)
-                }else if (sdk == Sdk.PYTHON_COLUMNAR) {
+                } else if (sdk == Sdk.PYTHON_COLUMNAR) {
                     BuildDockerColumnarPythonPerformer.build(env, dir, vers, imageName, onlySource)
-                }else if (sdk == Sdk.GO_COLUMNAR) {
+                } else if (sdk == Sdk.GO_COLUMNAR) {
                     BuildDockerColumnarGoPerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
+                } else if (sdk == Sdk.GO_ANALYTICS) {
+                    BuildDockerAnalyticsGoPerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
                 } else {
                     logger.severe("Do not yet know how to build " + sdkRaw)
                 }

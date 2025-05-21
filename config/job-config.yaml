@@ -137,6 +137,9 @@ matrix:
       version: 3.6.X
 
     - language: .NET
+      version: 3.7.X
+
+    - language: .NET
       version: snapshot
 
     # Earliest version the Go performer can compile is 2.3.0 (possibly earlier)
@@ -161,6 +164,9 @@ matrix:
 
     - language: Go
       version: 2.9.X
+
+    - language: Go
+      version: 2.10.X
 
     - language: Go
       version: snapshot
@@ -328,8 +334,9 @@ matrix:
       include:
         - language: Java
           version: snapshot
-        - language: C++
-          version: snapshot
+        # Remove C++ from transactino read load until CXXCBC-678 (double free crash) is fixed 
+        # - language: C++
+        #   version: snapshot
         - language: Go
           version: snapshot
       exclude:
