@@ -111,6 +111,9 @@ matrix:
     - language: Java
       version: snapshot
 
+    - language: Java
+      version: 3.X.X
+
       # If changing or adding any Gerrit patches, may need to make changes in ConfigParser
 
     - language: Scala
@@ -119,9 +122,8 @@ matrix:
     - language: Scala
       version: snapshot
 
-    # Kotlin performer not building: https://couchbase.slack.com/archives/C033YPWT6DC/p1701947947253859?thread_ts=1701771863.911269&cid=C033YPWT6DC
-#    - language: Kotlin
-#      version: snapshot
+    - language: Kotlin
+      version: snapshot
 
     # https://couchbase.slack.com/archives/C033YPWT6DC/p1692090337345279?thread_ts=1692029200.583649&cid=C033YPWT6DC
     - language: .NET
