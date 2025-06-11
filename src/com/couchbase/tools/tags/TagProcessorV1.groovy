@@ -49,7 +49,7 @@ class TagProcessorV1 {
     }
 
     String restore() {
-        String undeactivated = original.replaceAll("(?m)^" + Pattern.quote(commentPrefix + " [DEACTIVATED]"), "")
+        String undeactivated = original.replaceAll("\s*" + Pattern.quote(commentPrefix + " [DEACTIVATED]"), "")
 
         def list = new ArrayList()
         undeactivated.eachLine { line -> list.add(restoreActivatedCode(line)) }
