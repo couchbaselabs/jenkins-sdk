@@ -122,6 +122,7 @@ matrix:
     - language: Scala
       version: snapshot
 
+    # Kotlin SDK owner has opted out of testing non-snapshot builds
     - language: Kotlin
       version: snapshot
 
@@ -137,6 +138,9 @@ matrix:
 
     - language: .NET
       version: 3.6.X
+
+    - language: .NET
+      version: 3.7.X
 
     - language: .NET
       version: 3.7.X
@@ -185,6 +189,9 @@ matrix:
     - language: Python
       version: 4.3.X
 
+    - language: Python
+      version: 4.4.X
+
     - language: C++
       version: snapshot
 
@@ -203,11 +210,17 @@ matrix:
     - language: Node
       version: 4.4.X
 
+    - language: Node
+      version: 4.5.X
+
     - language: Ruby
       version: 3.4.X
 
     - language: Ruby
       version: 3.5.X
+
+    - language: Ruby
+      version: 3.6.X
 
     - language: Ruby
       version: snapshot
