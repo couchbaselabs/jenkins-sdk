@@ -214,6 +214,8 @@ class BuildPerformer {
                     BuildDockerAnalyticsGoPerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
                 } else if (sdk == Sdk.PYTHON_ANALYTICS) {
                     BuildDockerAnalyticsPythonPerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
+                } else if (sdk == Sdk.NODE_ANALYTICS) {
+                    BuildDockerAnalyticsNodePerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
                 } else {
                     logger.severe("Do not yet know how to build " + sdkRaw)
                 }
