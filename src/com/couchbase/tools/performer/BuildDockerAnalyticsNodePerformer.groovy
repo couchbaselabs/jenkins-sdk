@@ -6,6 +6,8 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 class BuildDockerAnalyticsNodePerformer {
+    private static String REPO = "github:couchbaselabs/analytics-nodejs-client"
+
     static void build(Environment imp, String path, VersionToBuild build, String imageName, boolean onlySource = false, Map<String, String> dockerBuildArgs = [:]) {
         imp.log("Building Node Analytics ${build}")
 
@@ -39,6 +41,10 @@ class BuildDockerAnalyticsNodePerformer {
             if (line.contains("couchbase-analytics")) {
                 if (build instanceof HasVersion) {
                     packageFile.append("\t\"couchbase-analytics\": \"${build.version()}\",\n")
+                } else if (build instanceof BuildMain) {
+                    packageFile.append("\t\"couchbase-analytics\": \"${REPO}\",\n")
+                } else if (build instanceof HasSha) {
+                    packageFile.append("\t\"couchbase-analytics\": \"${REPO}#${build.sha()}\",\n")
                 } else {
                     packageFile.append(line + "\n")
                 }
