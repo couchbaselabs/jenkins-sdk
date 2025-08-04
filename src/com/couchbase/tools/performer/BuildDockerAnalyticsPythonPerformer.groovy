@@ -41,6 +41,10 @@ class BuildDockerAnalyticsPythonPerformer {
 
             if (build instanceof HasVersion) {
                 dockerBuildArgs.put("BUILD_FROM_VERSION", build.version())
+            } else if (build instanceof BuildMain) {
+                dockerBuildArgs.put("BUILD_FROM_REPO", 'MAIN')
+            } else if (build instanceof HasSha) {
+                dockerBuildArgs.put("BUILD_FROM_REPO", build.sha())
             }
 
             def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
