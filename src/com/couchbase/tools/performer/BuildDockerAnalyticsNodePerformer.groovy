@@ -6,7 +6,7 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 class BuildDockerAnalyticsNodePerformer {
-    private static String REPO = "github:couchbaselabs/analytics-nodejs-client"
+    private static String REPO = "github:couchbase/analytics-nodejs-client"
 
     static void build(Environment imp, String path, VersionToBuild build, String imageName, boolean onlySource = false, Map<String, String> dockerBuildArgs = [:]) {
         imp.log("Building Node Analytics ${build}")
