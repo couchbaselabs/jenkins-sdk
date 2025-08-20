@@ -34,3 +34,9 @@ Creates all required tables.
 ```
 ./gradlew setupPerfDatabase
 ```
+
+or with args:
+
+```
+./gradlew setupPerfDatabase --args="--host timescaledb"
+```
