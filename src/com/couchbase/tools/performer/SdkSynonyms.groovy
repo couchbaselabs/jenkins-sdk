@@ -11,6 +11,7 @@ enum Sdk {
     NODE,
     GO,
     PHP,
+    RUST,
     JAVA_COLUMNAR,
     JAVA_ANALYTICS,
     NODE_COLUMNAR,
@@ -33,6 +34,7 @@ class SdkSynonyms {
         else if (isNode(input)) return Sdk.NODE
         else if (isGo(input)) return Sdk.GO
         else if (isPHP(input)) return Sdk.PHP
+        else if (isRust(input)) return Sdk.RUST
         else if (isJavaColumnar(input)) return Sdk.JAVA_COLUMNAR
         else if (isJavaAnalytics(input)) return Sdk.JAVA_ANALYTICS
         else if (isNodeColumnar(input)) return Sdk.NODE_COLUMNAR
@@ -85,6 +87,10 @@ class SdkSynonyms {
 
     public static boolean isPHP(String input) {
         return input.equalsIgnoreCase("php")
+    }
+
+    public static boolean isRust(String input) {
+        input.equalsIgnoreCase("rust")
     }
 
     public static boolean isJavaColumnar(String input) {

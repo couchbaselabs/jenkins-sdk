@@ -228,6 +228,9 @@ matrix:
     - language: Ruby
       version: snapshot
 
+    - language: Rust
+      version: snapshot
+
   workloads:
 
     # KV replaces
