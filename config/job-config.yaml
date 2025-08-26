@@ -143,7 +143,7 @@ matrix:
       version: 3.7.X
 
     - language: .NET
-      version: 3.7.X
+      version: 3.8.X
 
     - language: .NET
       version: snapshot
