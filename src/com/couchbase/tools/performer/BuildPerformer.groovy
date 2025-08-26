@@ -10,6 +10,7 @@ import com.couchbase.versions.ImplementationVersion
 import com.couchbase.versions.NodeVersions
 import com.couchbase.versions.PythonVersions
 import com.couchbase.versions.RubyVersions
+import com.couchbase.versions.RustVersions
 import com.couchbase.versions.Versions
 import groovy.cli.picocli.CliBuilder
 
@@ -68,7 +69,7 @@ class BuildPerformer {
 
         Map<String, String> dockerBuildArgs = new HashMap<>()
         if (options.a) {
-            if (!(sdk in [Sdk.CPP, Sdk.PYTHON, Sdk.RUBY, Sdk.GO, Sdk.GO_COLUMNAR, Sdk.PYTHON_ANALYTICS])) {
+            if (!(sdk in [Sdk.CPP, Sdk.PYTHON, Sdk.RUBY, Sdk.GO, Sdk.GO_COLUMNAR, Sdk.PYTHON_ANALYTICS, Sdk.RUST])) {
                 logger.severe("The docker-build-args parameter cannot be set for the ${sdk.name()} SDK.")
                 System.exit(-1)
             }
@@ -159,6 +160,10 @@ class BuildPerformer {
                     // Otherwise nothing will match until 3.5.0 release
                     versions.add(target)
                     break
+                case Sdk.RUST:
+                    def implementation = new PerfConfig.Implementation("Rust", "1.X.0", null)
+                    versions = Versions.versions(env, implementation, "Rust", RustVersions.allReleases)
+                    break
                 case Sdk.NODE_COLUMNAR:
                     def implementation = new PerfConfig.Implementation("Columnar-Node", "1.X.0", null)
                     versions = Versions.versions(env, implementation, "columnar-node")
@@ -204,7 +209,9 @@ class BuildPerformer {
                     BuildDockerDotNetPerformer.build(env, dir, vers, imageName, onlySource)
                 } else if (sdk == Sdk.NODE) {
                     BuildDockerNodePerformer.build(env, dir, vers, imageName, onlySource)
-                } else if (sdk == Sdk.NODE_COLUMNAR) {
+                } else if (sdk == Sdk.RUST) {
+                     BuildDockerRustPerformer.build(env, dir, vers, imageName, onlySource)
+                 } else if (sdk == Sdk.NODE_COLUMNAR) {
                     BuildDockerColumnarNodePerformer.build(env, dir, vers, imageName, onlySource)
                 } else if (sdk == Sdk.PYTHON_COLUMNAR) {
                     BuildDockerColumnarPythonPerformer.build(env, dir, vers, imageName, onlySource)

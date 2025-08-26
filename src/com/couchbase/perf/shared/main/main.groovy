@@ -25,6 +25,7 @@ import com.couchbase.versions.JVMVersions
 import com.couchbase.versions.PythonVersions
 import com.couchbase.versions.NodeVersions
 import com.couchbase.versions.RubyVersions
+import com.couchbase.versions.RustVersions
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.yaml.YamlSlurper
@@ -132,6 +133,15 @@ class Execute {
                     String version = RubyVersions.formatSnapshotVersion(highest, sha)
                     implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("\\+").last(), true))
                 }
+                else if (implementation.language == "Rust") {
+                    def snapshot = RustVersions.getLatestCargoEntry()
+                    if (snapshot == null) {
+                        ctx.env.log("Skipping rust snapshot")
+                    } else {
+                        ctx.env.log("Found cargo entry for Rust: ${snapshot}")
+                        implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot, null, null, true))
+                    }
+                }
                 else {
                     throw new UnsupportedOperationException("Cannot support snapshot builds with language ${implementation.language} yet")
                 }
@@ -146,6 +156,7 @@ class Execute {
                 else if (implementation.language == "Node") implementationsToAdd.addAll(versions(ctx.env, implementation, "Node", NodeVersions.allReleases))
                 else if (implementation.language == "C++") implementationsToAdd.addAll(versions(ctx.env, implementation, "C++", CppVersions.allReleases))
                 else if (implementation.language == "Ruby") implementationsToAdd.addAll(versions(ctx.env, implementation, "Ruby", RubyVersions.allReleases))
+                else if (implementation.language == "Rust") implementationsToAdd.addAll(versions(ctx.env, implementation, "Rust", RustVersions.allReleases))
                 else {
                     throw new UnsupportedOperationException("Cannot support snapshot builds with language ${implementation.language} yet")
                 }
