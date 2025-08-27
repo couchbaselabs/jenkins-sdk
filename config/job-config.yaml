@@ -26,8 +26,8 @@ servers:
 database:
   # When run by jenkins-sdk, jenkins-sdk will use `hostname`, and the driver will use `hostname_docker`.
   # They need to be separate to allow the driver to connect to the database when both are running inside Docker.
-  hostname: performance.sdk.couchbase.com
-  hostname_docker: performance.sdk.couchbase.com
+  hostname: performance-sdk.couchbase.com
+  hostname_docker: performance-sdk.couchbase.com
   port: 5432
   username: postgres
   # This isn't the real production password!  It gets overridden on CI via a CLI argument.
