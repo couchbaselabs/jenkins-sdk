@@ -2,6 +2,7 @@ package com.couchbase.versions
 
 import com.couchbase.tools.network.NetworkUtil
 import groovy.json.JsonSlurper
+import java.util.stream.Collectors
 
 class GithubSnapshotAttributes {
     public String sha
@@ -72,7 +73,13 @@ class GithubVersions {
     }
 
     static GithubSnapshotAttributes getSnapshotAttributes(String repo, String shaOrBranch) {
-        def tags = getAllReleasesWithCommitSha(repo)
+        var tags = new HashMap<String, ImplementationVersion>()
+        for (var it : getAllReleasesWithCommitSha(repo)) {
+            if (!tags.containsKey(it.getV1()) || it.getV2() > tags.get(it.getV1())) {
+                // If there are multiple tags on the same commit, keep the one representing the highest version
+                tags.put(it.getV1(), it.getV2())
+            }
+        }
 
         def url = "https://api.github.com/repos/${repo}/commits?sha=${shaOrBranch}"
         int commitsSinceTag = 0
@@ -102,11 +109,11 @@ class GithubVersions {
     }
 
     static Set<ImplementationVersion> getAllReleases(String repo) {
-        return getAllReleasesWithCommitSha(repo).values()
+        return getAllReleasesWithCommitSha(repo).stream().map(Tuple2::getV2).collect(Collectors.toSet())
     }
 
-    private static Map<String, ImplementationVersion> getAllReleasesWithCommitSha(String repo) {
-        def out = new HashMap<String, ImplementationVersion>()
+    private static Set<Tuple2<String, ImplementationVersion>> getAllReleasesWithCommitSha(String repo) {
+        def out = new HashSet<Tuple2<String, ImplementationVersion>>();
         def baseUrl = "https://api.github.com/repos/${repo}/tags"
         def nextUrl = baseUrl
 
@@ -119,10 +126,9 @@ class GithubVersions {
 
             for (doc in json) {
                 try {
-                    out.put(doc.commit.sha, ImplementationVersion.from(doc.name))
-                }
-                catch (err) {
-                    System.err.println("Failed to add ${repo} version ${doc}")
+                    out.add(new Tuple2<String, ImplementationVersion>(doc.commit.sha, ImplementationVersion.from(doc.name)))
+                } catch (e) {
+                    System.err.println("Failed to add ${repo} version ${doc}: ${e}")
                 }
             }
         }
