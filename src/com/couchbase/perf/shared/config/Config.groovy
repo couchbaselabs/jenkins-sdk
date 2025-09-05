@@ -85,13 +85,14 @@ class PerfConfig {
 
         @CompileDynamic
         def toJsonRaw(boolean forDatabaseComparison) {
+            // As always we need to make sure we're comparing apples-to-apples when looking for matching runs in the database.
+            // So anything that may affect the performance of the run should go into the database and be looked for in queries.
+            // This includes many details of the cluster.
             def out = [
                     "version"   : version,
                     "nodeCount" : nodeCount,
                     "memory"    : memory,
                     "cpuCount"  : cpuCount,
-                    "type"      : type,
-                    "storage"   : storage,
                     "replicas"  : replicas,
                     "instance"  : instance,
                     "compaction": compaction,
@@ -103,9 +104,14 @@ class PerfConfig {
             // There's a lot of existing tests that don't have this connectionString field, so we only check it for
             // newer tests - e.g. Protostellar ones.
             // Update: now edited the database so all tests include it.
+            // Update: have moved the connectionString check from here, as it messes up FaaS - which uses cbdinocluster
+            // so we don't know what the connStr is.
+            // It's also, strictly speaking, not a property of the cluster itself.
+            // We will need to handle CNG differently when we get back to it.
             if (forDatabaseComparison) {
-                out.put("connectionString", connection_string_performer)
+                // Checks here removed, see comments above.
             }
+
             if (!forDatabaseComparison) {
                 out.put("connection_string_driver", connection_string_driver)
                 out.put("connection_string_driver_docker", connection_string_driver_docker)
@@ -115,6 +121,10 @@ class PerfConfig {
                 out.put("hostname_rest_docker", hostname_rest_docker)
                 out.put("cert_path", cert_path)
                 out.put("insecure", insecure)
+                out.put("type", type)
+                // Storage has been removed from the database comparison partly for convenience.. 
+                // Storage type changed at 8.0 to Magma, and it's just easier on the frontend if we don't have to hardcode that knowledge.
+                out.put("storage", storage)
             }
             if (isCouchbase2()) {
                 out.put("cloudNativeGatewayVersion", cloudNativeGatewayVersion)
