@@ -134,13 +134,10 @@ class Execute {
                     implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("\\+").last(), true))
                 }
                 else if (implementation.language == "Rust") {
-                    def snapshot = RustVersions.getLatestCargoEntry()
-                    if (snapshot == null) {
-                        ctx.env.log("Skipping rust snapshot")
-                    } else {
-                        ctx.env.log("Found cargo entry for Rust: ${snapshot}")
-                        implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot, null, null, true))
-                    }
+                    def version = RustVersions.getLatestSnapshotPrerelease()
+                    def sha = (version.snapshot != null && version.snapshot.contains('+')) ? version.snapshot.split("\\+").last() : null
+                    ctx.env.log("Found latest snapshot for Rust: ${version}")
+                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version.toString(), null, sha, true))
                 }
                 else {
                     throw new UnsupportedOperationException("Cannot support snapshot builds with language ${implementation.language} yet")

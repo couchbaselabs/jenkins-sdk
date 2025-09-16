@@ -10,19 +10,21 @@ import groovy.transform.CompileStatic
 class BuildDockerRustSDKPerformer extends Stage{
 
     private final String sdkVersion
+    private final String sha
     final String imageName
 
     static String genImageName(String sdkVersion) {
-        return "performer-rust" + sdkVersion
+        return "performer-rust" + sdkVersion.replace('+', '-')
     }
 
-    BuildDockerRustSDKPerformer(String sdkVersion) {
-        this(BuildDockerRustSDKPerformer.genImageName(sdkVersion), sdkVersion)
+    BuildDockerRustSDKPerformer(String sdkVersion, String sha) {
+        this(genImageName(sdkVersion), sdkVersion, sha)
     }
 
-    BuildDockerRustSDKPerformer(String imageName, String sdkVersion) {
+    BuildDockerRustSDKPerformer(String imageName, String sdkVersion, String sha) {
         this.sdkVersion = sdkVersion
         this.imageName = imageName
+        this.sha = sha
     }
 
     @Override
@@ -32,7 +34,7 @@ class BuildDockerRustSDKPerformer extends Stage{
 
     @Override
     void executeImpl(StageContext ctx) {
-        BuildDockerRustPerformer.build(ctx.env, ctx.sourceDir(), VersionToBuildUtil.from(sdkVersion, null), imageName)
+        BuildDockerRustPerformer.build(ctx.env, ctx.sourceDir(), VersionToBuildUtil.from(sdkVersion, sha), imageName)
     }
 
     String getImageName(){

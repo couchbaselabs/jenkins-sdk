@@ -4,6 +4,8 @@ import com.couchbase.context.environments.Environment
 import com.couchbase.tools.tags.TagProcessor
 import groovy.transform.CompileStatic
 
+import java.util.regex.Pattern
+
 class BuildDockerRustPerformer {
     private static String master = "main"
 
@@ -18,14 +20,14 @@ class BuildDockerRustPerformer {
         imp.dirAbsolute(path) {
             imp.dir('transactions-fit-performer') {
                 imp.dir("performers/rust") {
-                    TagProcessor.processTags(new File(imp.currentDir()), build)
+                    TagProcessor.processTags(new File(imp.currentDir()), build, Optional.of(Pattern.compile(".*\\.rs")))
                 }
                 if (!onlySource) {
                     if (build instanceof BuildMain) {
                         imp.execute("docker build -f performers/rust/Dockerfile -t $imageName .", false, true, true)
                     }
                     else if (build instanceof HasSha) {
-                        imp.execute("docker build -f performers/rust/Dockerfile -t $imageName --build-arg SDK_BRANCH=${build.sha()} .", false, true, true)
+                        imp.execute("docker build -f performers/rust/Dockerfile -t $imageName --build-arg SDK_SHA=${build.sha()} .", false, true, true)
                     }
                     else if (build instanceof HasVersion) {
                         imp.execute("docker build -f performers/rust/Dockerfile -t $imageName --build-arg SDK_TAG=${build.version()} .", false, true, true)
