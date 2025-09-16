@@ -185,18 +185,14 @@ class Execute {
             try {
                 var resp1 = getContents(hostnameRest + "/pools/default", adminUsername, adminPassword)
                 var resp2 = getContents(hostnameRest + "/pools", adminUsername, adminPassword)
-                // Assume one bucket, and assume it's called "default"
-                var resp3 = getContents(hostnameRest + "/pools/default/b/default", adminUsername, adminPassword)
 
                 ctx.env.log("/pools/default: ${resp1}")
                 ctx.env.log("/pools: ${resp2}")
-                ctx.env.log("/pools/default/b/default: ${resp3}")
 
                 def jsonSlurper = new JsonSlurper()
 
                 var raw1 = jsonSlurper.parseText(resp1)
                 var raw2 = jsonSlurper.parseText(resp2)
-                var raw3 = jsonSlurper.parseText(resp3)
 
                 var node1 = raw1.nodes[0]
 
@@ -215,8 +211,8 @@ class Execute {
                     ctx.env.log("Setting cpuCount to ${cluster.cpuCount}")
                 }
                 if (cluster.replicas == null) {
-                    cluster.replicas = raw3.vBucketServerMap.numReplicas
-                    ctx.env.log("Setting replicas to ${cluster.replicas}")
+                    cluster.replicas = 1
+                    ctx.env.log("Setting replicas to default of 1 copy (just active)")
                 }
                 if (cluster.version == null) {
                     cluster.version = raw2.implementationVersion
