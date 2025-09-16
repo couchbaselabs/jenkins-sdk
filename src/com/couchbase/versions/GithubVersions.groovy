@@ -101,6 +101,37 @@ class GithubVersions {
         throw new RuntimeException("Could not find the nearest tag for ${shaOrBranch} in ${repo}")
     }
 
+    static GithubSnapshotAttributes getSnapshotAttributesUsingReferenceCommit(
+            String repo,
+            String shaOrBranch,
+            String referenceSha,
+            ImplementationVersion referenceVersion) {
+
+        int commitsSinceReference = 0
+        String snapshotSha = null
+
+        def url = "https://api.github.com/repos/${repo}/commits?sha=${shaOrBranch}"
+
+        while (url != null) {
+            def commitsConnection = NetworkUtil.readRaw(url)
+            def commitsParser = new JsonSlurper()
+            def commitsJson = commitsParser.parseText(commitsConnection.getInputStream().getText())
+
+            for (commit in commitsJson) {
+                if (snapshotSha == null) {
+                    snapshotSha = commit.sha.substring(0, 7)
+                }
+
+                if (commit.sha == referenceSha) {
+                    return new GithubSnapshotAttributes(snapshotSha, referenceVersion, commitsSinceReference)
+                }
+                commitsSinceReference++
+            }
+            url = parseLinkHeaderForNext(commitsConnection)
+        }
+        throw new RuntimeException("Could not find reference commit ${referenceSha} from ${shaOrBranch} in ${repo}")
+    }
+
     static Set<ImplementationVersion> getAllReleases(String repo) {
         return getAllReleasesWithCommitSha(repo).values()
     }
