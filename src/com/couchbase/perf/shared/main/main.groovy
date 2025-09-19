@@ -208,8 +208,8 @@ class Execute {
                     ctx.env.log("Setting cpuCount to ${cluster.cpuCount}")
                 }
                 if (cluster.replicas == null) {
-                    cluster.replicas = 1
-                    ctx.env.log("Setting replicas to default of 1 copy (just active)")
+                    cluster.replicas = 0
+                    ctx.env.log("Setting replicas to default of 0 copies (just active)")
                 }
                 if (cluster.version == null) {
                     cluster.version = raw2.implementationVersion
