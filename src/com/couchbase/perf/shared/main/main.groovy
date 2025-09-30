@@ -72,19 +72,31 @@ class Execute {
             }
             else if (implementation.version() == "snapshot") {
                 if (implementation.language == "Java") {
-                    def snapshot = JVMVersions.getLatestSnapshotBuild("java-client")
-                    ctx.env.log("Found snapshot build for Java: ${snapshot}")
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.toString(), null, null, true))
+                    try {
+                        def snapshot = JVMVersions.getLatestSnapshotBuild("java-client")
+                        ctx.env.log("Found snapshot build for Java: ${snapshot}")
+                        implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.toString(), null, null, true))
+                    } catch (Throwable err) {
+                        ctx.env.log("Skipping Java snapshot due to error: ${err}")
+                    }
                 }
                 else if (implementation.language == "Kotlin") {
-                    def snapshot = JVMVersions.getLatestSnapshotBuild("kotlin-client")
-                    ctx.env.log("Found snapshot build for Kotlin: ${snapshot}")
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.toString(), null, null, true))
+                    try {
+                        def snapshot = JVMVersions.getLatestSnapshotBuild("kotlin-client")
+                        ctx.env.log("Found snapshot build for Kotlin: ${snapshot}")
+                        implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.toString(), null, null, true))
+                    } catch (Throwable err) {
+                        ctx.env.log("Skipping Kotlin snapshot due to error: ${err}")
+                    }
                 }
                 else if (implementation.language == "Scala") {
-                    def snapshot = JVMVersions.getLatestSnapshotBuild("scala-client_2.12")
-                    ctx.env.log("Found snapshot build for Scala: ${snapshot}")
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.toString(), null, null, true))
+                    try {
+                        def snapshot = JVMVersions.getLatestSnapshotBuild("scala-client_2.12")
+                        ctx.env.log("Found snapshot build for Scala: ${snapshot}")
+                        implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.toString(), null, null, true))
+                    } catch (Throwable err) {
+                        ctx.env.log("Skipping Scala snapshot due to error: ${err}")
+                    }
                 }
                 else if (implementation.language == ".NET") {
                     def sha = DotNetVersions.getLatestSha()
