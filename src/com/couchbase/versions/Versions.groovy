@@ -40,7 +40,12 @@ class Versions {
     }
 
     static List<PerfConfig.Implementation> jvmVersions(Environment env, Object implementation, String client) {
-        def allVersions = JVMVersions.getAllJVMReleases(client)
+        Set<ImplementationVersion> allVersions = new HashSet<ImplementationVersion>()
+        try {
+            allVersions = JVMVersions.getAllJVMReleases(client)
+        } catch (Throwable err) {
+            env.log("Warning: failed to fetch JVM releases for ${client}. Will continue without them. Error: ${err}")
+        }
         return versions(env, implementation, client, allVersions)
     }
 
