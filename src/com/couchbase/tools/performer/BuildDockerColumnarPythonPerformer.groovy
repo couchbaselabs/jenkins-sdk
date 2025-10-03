@@ -27,36 +27,30 @@ class BuildDockerColumnarPythonPerformer {
 
         imp.dirAbsolute(path) {
             imp.dir('transactions-fit-performer/performers/columnar/python') {
-                writePythonRequirementsFile(imp, build)
-                TagProcessor.processTags(new File(imp.currentDir()), build, Optional.of(Pattern.compile(".*\\.py")))
+                // Explanation of the regex:
+                // ^                                 - Start of the string (path)
+                // (?!.*[/\\]\.venv[/\\])           - Negative Lookahead: Ensure the path does NOT contain "/.venv/"
+                //                                     (?:.*) matches any characters (non-greedy)
+                //                                     [/\\] matches either / or \ (for path separators)
+                // (?!.*[/\\]protocol[/\\])         - Negative Lookahead: Ensure the path does NOT contain "/protocol/"
+                // .* - Match any characters (the actual path content)
+                // \.py                              - Match ".py" literally (dot needs escaping)
+                String regex = "^(?!.*[\\\\/]\\.venv[\\\\/])(?!.*[\\\\/](?:protocol)[\\\\/]).*\\.py"
+                TagProcessor.processTags(new File(imp.currentDir()), build, Optional.of(Pattern.compile(regex)))
+            }
+
+            if (build instanceof HasVersion) {
+                dockerBuildArgs.put("BUILD_FROM_VERSION", build.version())
+            } else if (build instanceof BuildMain) {
+                dockerBuildArgs.put("BUILD_FROM_REPO", 'MAIN')
+            } else if (build instanceof HasSha) {
+                dockerBuildArgs.put("BUILD_FROM_REPO", build.sha())
             }
 
             def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
 
             if (!onlySource) {
                 imp.execute("docker build -f ./transactions-fit-performer/performers/columnar/python/Dockerfile -t $imageName $serializedBuildArgs .", false, true, true)
-            }
-        }
-    }
-
-    private static void writePythonRequirementsFile(Environment imp, VersionToBuild build) {
-        def requirements = new File("${imp.currentDir()}/requirements.txt")
-        def lines = requirements.readLines()
-        requirements.write("")
-
-        for (String line : lines) {
-            if ((line.contains("couchbase") && !line.contains("/")) || line.contains("github.com/couchbaselabs/columnar-python-client")) {
-                if (build instanceof HasSha) {
-                    requirements.append("git+https://github.com/couchbaselabs/columnar-python-client.git@${build.sha()}#egg=couchbase\n")
-                }
-                else if (build instanceof HasVersion) {
-                    requirements.append("couchbase==${build.version()}\n")
-                }
-                else if (build instanceof BuildMain) {
-                    requirements.append("git+https://github.com/couchbaselabs/columnar-python-client.git@master#egg=couchbase\n")
-                }
-            } else {
-                requirements.append(line + "\n")
             }
         }
     }
