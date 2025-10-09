@@ -72,9 +72,9 @@ class GithubVersions {
         return date + "." + time + "+" + sha.substring(0, 7)
     }
 
-    static GithubSnapshotAttributes getSnapshotAttributes(String repo, String shaOrBranch) {
+    static GithubSnapshotAttributes getSnapshotAttributes(String repo, String shaOrBranch, Closure<String> versionTagNormalizer = null) {
         var tags = new HashMap<String, ImplementationVersion>()
-        for (var it : getAllReleasesWithCommitSha(repo)) {
+        for (var it : getAllReleasesWithCommitSha(repo, versionTagNormalizer)) {
             if (!tags.containsKey(it.getV1()) || it.getV2() > tags.get(it.getV1())) {
                 // If there are multiple tags on the same commit, keep the one representing the highest version
                 tags.put(it.getV1(), it.getV2())
@@ -139,11 +139,11 @@ class GithubVersions {
         throw new RuntimeException("Could not find reference commit ${referenceSha} from ${shaOrBranch} in ${repo}")
     }
 
-    static Set<ImplementationVersion> getAllReleases(String repo) {
-        return getAllReleasesWithCommitSha(repo).stream().map(Tuple2::getV2).collect(Collectors.toSet())
+    static Set<ImplementationVersion> getAllReleases(String repo, Closure<String> versionTagNormalizer = null) {
+        return getAllReleasesWithCommitSha(repo, versionTagNormalizer).stream().map(Tuple2::getV2).collect(Collectors.toSet())
     }
 
-    private static Set<Tuple2<String, ImplementationVersion>> getAllReleasesWithCommitSha(String repo) {
+    private static Set<Tuple2<String, ImplementationVersion>> getAllReleasesWithCommitSha(String repo, Closure<String> versionTagNormalizer = null) {
         def out = new HashSet<Tuple2<String, ImplementationVersion>>();
         def baseUrl = "https://api.github.com/repos/${repo}/tags"
         def nextUrl = baseUrl
@@ -157,7 +157,11 @@ class GithubVersions {
 
             for (doc in json) {
                 try {
-                    out.add(new Tuple2<String, ImplementationVersion>(doc.commit.sha, ImplementationVersion.from(doc.name)))
+                    def name = doc.name
+                    if (versionTagNormalizer != null) {
+                        name = versionTagNormalizer.call(name)
+                    }
+                    out.add(new Tuple2<String, ImplementationVersion>(doc.commit.sha, ImplementationVersion.from(name)))
                 } catch (e) {
                     System.err.println("Failed to add ${repo} version ${doc}: ${e}")
                 }
