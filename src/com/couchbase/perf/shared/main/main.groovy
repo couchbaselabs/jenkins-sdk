@@ -146,7 +146,7 @@ class Execute {
                     implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version, null, sha.split("\\+").last(), true))
                 }
                 else if (implementation.language == "Rust") {
-                    def version = RustVersions.getLatestSnapshotPrerelease()
+                    def version = RustVersions.getLatestSnapshot()
                     def sha = (version.snapshot != null && version.snapshot.contains('+')) ? version.snapshot.split("\\+").last() : null
                     ctx.env.log("Found latest snapshot for Rust: ${version}")
                     implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, version.toString(), null, sha, true))
