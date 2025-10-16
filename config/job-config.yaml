@@ -195,6 +195,9 @@ matrix:
     - language: Python
       version: 4.4.X
 
+    - language: Python
+      version: 4.5.X
+
     - language: C++
       version: snapshot
 
@@ -216,6 +219,9 @@ matrix:
     - language: Node
       version: 4.5.X
 
+    - language: Node
+      version: 4.6.X
+
     - language: Ruby
       version: 3.4.X
 
@@ -224,6 +230,9 @@ matrix:
 
     - language: Ruby
       version: 3.6.X
+
+    - language: Ruby
+      version: 3.7.X
 
     - language: Ruby
       version: snapshot
