@@ -15,7 +15,7 @@ class InitialiseCluster extends Stage {
 
     InitialiseCluster(PerfConfig.Cluster cluster) {
         this.cluster = cluster
-        if (cluster.type == "unmanaged") {
+        if (cluster.type == "unmanaged" || cluster.type == null) {
             // no-op
         }
         // currently doesn't work with cbdyncluster
