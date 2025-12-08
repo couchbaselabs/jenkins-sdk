@@ -29,7 +29,7 @@ class BuildDockerDotNetPerformer {
                 if (build instanceof HasVersion && build.implementationVersion().isBelow(ImplementationVersion.from("3.8.2"))){
                     dotnetVersion = "8.0"
                 }
-                else if (build instanceof HasVersion && build.implementationVersion().isBelow(ImplementationVersion.from("3.4.14"))){
+                if (build instanceof HasVersion && build.implementationVersion().isBelow(ImplementationVersion.from("3.4.14"))){
                     dotnetVersion = "6.0"
                 }
 
