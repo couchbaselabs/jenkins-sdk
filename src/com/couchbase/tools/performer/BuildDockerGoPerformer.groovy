@@ -23,7 +23,8 @@ class BuildDockerGoPerformer {
         imp.dirAbsolute(path) {
             imp.dir('transactions-fit-performer') {
                 imp.dir('performers/go') {
-                    TagProcessor.processTags(new File(imp.currentDir()), build, Optional.of(Pattern.compile(".*\\.go")))
+                    def tagBuild = maybeUpdateTagVersion(imp, build)
+                    TagProcessor.processTags(new File(imp.currentDir()), tagBuild, Optional.of(Pattern.compile(".*\\.go")))
                 }
 
                 // We check HasSha and HasGerrit _before_ HasVersion, since BuildShaVersion & BuildGerritVersion
@@ -52,5 +53,22 @@ class BuildDockerGoPerformer {
                 }
             }
         }
+    }
+
+    @CompileStatic
+    private static VersionToBuild maybeUpdateTagVersion(Environment imp, VersionToBuild build) {
+        if (build instanceof HasSha) {
+            String packageJsonUrl = "https://proxy.golang.org/github.com/couchbase/gocb/v2/@v/${build.sha()}.info"
+            def jsonResponse = (Map) NetworkUtil.readJson(packageJsonUrl)
+            def version = jsonResponse["Version"] as String
+
+            String pkgVersion = version.split("-")[0] // we don't care about the bit after - so we'll get e.g. v2.11.1
+            def pkgBuildVersion = new BuildVersion(pkgVersion.substring(1, pkgVersion.length())) // remove leading 'v'
+            imp.log("Updating build to ${pkgBuildVersion.version()} based on package.json from SHA (${build.sha().substring(0, 7)})")
+
+            return new BuildShaVersion(pkgBuildVersion.version(), build.sha())
+        }
+
+        return build
     }
 }
