@@ -17,6 +17,6 @@ class GoVersions {
 
     @Memoized
     static Set<ImplementationVersion> getAllReleases() {
-        return GithubVersions.getAllReleases(REPO)
+        return GithubVersions.getAllReleases(REPO, { name -> name.startsWith("v") ? name.substring(1) : name })
     }
 }
