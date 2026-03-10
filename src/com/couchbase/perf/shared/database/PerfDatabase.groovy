@@ -44,11 +44,6 @@ class PerfDatabase {
         // This turns a regular postgres database into a timescaledb one
         execute(sql, env, "SELECT create_hypertable('buckets', 'time', migrate_data => true, if_not_exists => true)")
 
-        // Cleanup buckets and metrics for which the run has been removed
-        execute(sql, env, "delete from buckets where run_id not in (select id from runs);")
-        execute(sql, env, "delete from metrics where run_id not in (select id from runs);")
-        execute(sql, env, "delete from run_events where run_id not in (select id from runs);")
-
         // Situational testing
         execute(sql, env, "CREATE TABLE IF NOT EXISTS situational_runs (id uuid, datetime TIMESTAMPTZ)")
         execute(sql, env, "CREATE TABLE IF NOT EXISTS situational_run_join (situational_run_id uuid, run_id uuid, params jsonb)")
