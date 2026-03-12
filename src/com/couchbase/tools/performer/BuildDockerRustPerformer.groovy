@@ -30,7 +30,7 @@ class BuildDockerRustPerformer {
                         imp.execute("docker build -f performers/rust/Dockerfile -t $imageName --build-arg SDK_SHA=${build.sha()} .", false, true, true)
                     }
                     else if (build instanceof HasVersion) {
-                        imp.execute("docker build -f performers/rust/Dockerfile -t $imageName --build-arg SDK_TAG=${build.version()} .", false, true, true)
+                        imp.execute("docker build -f performers/rust/Dockerfile -t $imageName --build-arg SDK_TAG=v${build.version()} .", false, true, true)
                     }
                 }
             }
