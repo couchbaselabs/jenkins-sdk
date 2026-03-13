@@ -37,28 +37,26 @@ class JVMVersions {
 
     @Memoized
     static Set<ImplementationVersion> getAllJVMReleases(String client) {
-        int start = 0
         def out = new HashSet<ImplementationVersion>()
 
-        while (true) {
-            String url = "https://search.maven.org/solrsearch/select?q=g:com.couchbase.client+AND+a:${client}&start=${start}&core=gav&rows=20&wt=json"
-            def json = NetworkUtil.readJson(url)
-            def docs = json.response.docs
+        String url = "https://repo1.maven.org/maven2/com/couchbase/client/${client}/maven-metadata.xml"
+        def xml = NetworkUtil.readXml(url)
 
-            if (docs.size() == 0) {
-                break
-            }
-            else {
-                for (doc in docs) {
-                    String version = doc.v
-                    try {
-                        out.add(ImplementationVersion.from(version))
-                    }
-                    catch (err) {
-                        System.err.println("Failed to add version ${client} ${doc}")
-                    }
+        // Filter out 2.X SDKs
+        def minJavaVersion = ImplementationVersion.from("3.0.0")
+        boolean isJava = client.toLowerCase().startsWith("java")
+
+        xml.versioning.versions.version.each { doc ->
+            String version = doc.text()
+            try {
+                def v = ImplementationVersion.from(version)
+                
+                if (!isJava || !v.isBelow(minJavaVersion)) {
+                    out.add(v)
                 }
-                start += docs.size()
+            }
+            catch (err) {
+                System.err.println("Failed to add version ${client} ${version}")
             }
         }
 
