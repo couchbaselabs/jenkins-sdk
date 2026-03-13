@@ -85,3 +85,10 @@ task setupPerfDatabase(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "com.couchbase.tools.perf.database.SetupPerfDatabase"
 }
+
+task listSdkVersions(type: JavaExec) {
+    group = "Execution"
+    description = "List available versions for a given SDK"
+    classpath = sourceSets.main.runtimeClasspath
+    main = "com.couchbase.tools.versions.ListSdkVersions"
+}

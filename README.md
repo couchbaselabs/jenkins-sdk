@@ -28,6 +28,12 @@ See the comments on `BuilderPerformer` for more.
 ./gradlew buildPerformer --args="-d <some_path> -s kotlin -v 1.0.0 -i performer"
 ```
 
+# Outputting SDK versions
+
+```
+./gradlew listVersions --args="-s scala"
+```
+
 # Setting up performance database
 Creates all required tables.
 
