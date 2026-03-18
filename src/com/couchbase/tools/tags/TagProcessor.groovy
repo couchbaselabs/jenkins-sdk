@@ -114,6 +114,7 @@ class TagProcessor {
             r longOpt: 'restore', argName: 'r', 'Restore mode'
             d longOpt: 'directory', args: 1, argName: 'd', required: true, 'Directory to scan'
             v longOpt: 'version', args: 1, argName: 'v', required: true, 'Version'
+            e longOpt: 'extension', args: 1, argName: 'e', required: false, 'Filename extension to process (including dot if applicable)'
         }
         def options = cli.parse(args)
         if (!options || !options.d || !options.v) {
@@ -126,10 +127,15 @@ class TagProcessor {
             return
         }
 
+        Optional<Pattern> filePathFilter = Optional.empty()
+        if (options.e) {
+            filePathFilter = Optional.of(Pattern.compile(".*" + Pattern.quote(options.e)))
+        }
+
         if (options.v) {
-            processTags(new File(options.d), new BuildVersion(options.v))
+            processTags(new File(options.d), new BuildVersion(options.v), filePathFilter)
         } else {
-            processTags(new File(options.d), new BuildMain())
+            processTags(new File(options.d), new BuildMain(), filePathFilter)
         }
     }
 }
