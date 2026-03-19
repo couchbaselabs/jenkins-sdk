@@ -25,11 +25,10 @@ class BuildDockerAnalyticsJvmPerformer {
                 "SDK_LANG"   : sdkLanguage,
                 "SDK_GIT_REV": gitRev(build),
         ]
-        def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
 
         env.dirAbsolute(path) {
             env.dir('transactions-fit-performer') {
-                env.execute("docker build --no-cache -f performers/analytics/jvm/Dockerfile $serializedBuildArgs -t $imageName .", false, true, true)
+                env.dockerBuild("--no-cache -f performers/analytics/jvm/Dockerfile -t $imageName .", dockerBuildArgs)
             }
         }
     }

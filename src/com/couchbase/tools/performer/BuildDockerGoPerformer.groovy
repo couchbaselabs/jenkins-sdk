@@ -45,11 +45,8 @@ class BuildDockerGoPerformer {
                     dockerBuildArgs.put(VERSION_ARG, json["Origin"]["Hash"] as String)
                 }
 
-
-                def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
-
                 if (!onlySource) {
-                    imp.execute("docker build -f performers/go/Dockerfile $serializedBuildArgs -t $imageName .", false, true, true)
+                    imp.dockerBuild("-f performers/go/Dockerfile -t $imageName .", dockerBuildArgs)
                 }
             }
         }

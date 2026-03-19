@@ -45,6 +45,7 @@ class BuildPerformer {
             b(longOpt: 'build-validation', args: 1, 'Validation mode.  "auto" = build various versions of the SDK')
             g(longOpt: 'gerrit-ref', args: 1, 'Gerrit Changeset. e.g. "refs/changes/99/999999/1"')
             a(longOpt: 'docker-build-args', args: 1, 'Docker build arguments. e.g. "ARG1=foo ARG2=bar"')
+            p(type: String, longOpt: 'platform', args: 1, 'Docker image platform. e.g. "linux/amd64"')
         }
 
         cli.usage()
@@ -58,7 +59,7 @@ class BuildPerformer {
 
         String sdkRaw = options.s.toLowerCase().trim()
         def sdk = SdkSynonyms.sdk(sdkRaw)
-        def env = new Environment()
+        def env = new Environment(options.p as String)
         Optional<String> version = options.v ? Optional.of(options.v) : Optional.empty()
         Optional<String> sha = options.c ? Optional.of(options.c) : Optional.empty()
         Optional<String> gerrit = options.g ? Optional.of(options.g) : Optional.empty()

@@ -43,11 +43,9 @@ class BuildDockerColumnarNodePerformer {
                     dockerBuildArgs.put("BUILD_FROM_REPO", build.sha())
                 }
 
-                def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
-
                 if (!onlySource) {
                     imp.log("building docker container")
-                    imp.execute("docker build -f performers/columnar/node/Dockerfile -t $imageName $serializedBuildArgs .", false, true, true)
+                    imp.dockerBuild("-f performers/columnar/node/Dockerfile -t $imageName .", dockerBuildArgs)
                 }
             }
         }

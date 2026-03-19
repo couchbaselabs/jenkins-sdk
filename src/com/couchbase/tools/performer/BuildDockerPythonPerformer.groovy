@@ -34,10 +34,8 @@ class BuildDockerPythonPerformer {
                     TagProcessor.processTags(new File(imp.currentDir()), build, Optional.of(Pattern.compile(".*\\.py")))
                 }
 
-                def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
-
                 if (!onlySource) {
-                    imp.execute("docker build -f ./performers/python/Dockerfile -t $imageName $serializedBuildArgs .", false, true, true)
+                    imp.dockerBuild("-f ./performers/python/Dockerfile -t $imageName .", dockerBuildArgs)
                 }
             }
         }
