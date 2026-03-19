@@ -39,7 +39,7 @@ class BuildDockerJavaFITPerformer extends Stage {
                 imp.dir('performers/java') {
                     writePomFile(imp)
                 }
-                imp.execute("docker build -f performers/java/Dockerfile -t $imageName .")
+                imp.dockerBuild("-f performers/java/Dockerfile -t $imageName .")
             }
         }
     }

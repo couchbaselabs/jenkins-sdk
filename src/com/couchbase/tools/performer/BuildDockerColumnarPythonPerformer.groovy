@@ -47,10 +47,8 @@ class BuildDockerColumnarPythonPerformer {
                 dockerBuildArgs.put("BUILD_FROM_REPO", build.sha())
             }
 
-            def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
-
             if (!onlySource) {
-                imp.execute("docker build -f ./transactions-fit-performer/performers/columnar/python/Dockerfile -t $imageName $serializedBuildArgs .", false, true, true)
+                imp.dockerBuild("-f ./transactions-fit-performer/performers/columnar/python/Dockerfile -t $imageName .", dockerBuildArgs)
             }
         }
     }

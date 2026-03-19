@@ -39,11 +39,8 @@ class BuildDockerColumnarGoPerformer {
                     dockerBuildArgs.put(VERSION_ARG, "main")
                 }
 
-
-                def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
-
                 if (!onlySource) {
-                    imp.execute("docker build -f performers/columnar/go/Dockerfile $serializedBuildArgs -t $imageName .", false, true, true)
+                    imp.dockerBuild("-f performers/columnar/go/Dockerfile -t $imageName .", dockerBuildArgs)
                 }
             }
         }

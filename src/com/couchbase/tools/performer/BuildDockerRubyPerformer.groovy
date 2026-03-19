@@ -47,10 +47,8 @@ class BuildDockerRubyPerformer {
                     dockerBuildArgs.put("SDK_BRANCH", "main")
                 }
 
-                def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
-
                 if (!onlySource) {
-                    imp.execute("docker build -f performers/ruby/dockerfiles/$dockerfile $serializedBuildArgs -t $imageName .", false, true, true)
+                    imp.dockerBuild("-f performers/ruby/dockerfiles/$dockerfile -t $imageName .", dockerBuildArgs)
                 }
             }
         }

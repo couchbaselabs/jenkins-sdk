@@ -20,9 +20,11 @@ class Environment {
     public final String workspaceAbs
     private final File logFile
     private final Object config
+    private final String platform // Nullable
 
     @CompileDynamic
-    Environment() {
+    Environment(String platform = null) {
+        this.platform = platform
         initialDir = System.getProperty("user.dir")
     }
 
@@ -96,6 +98,18 @@ class Environment {
             return executableOverrides.get(exe)
         }
         return exe
+    }
+
+    String dockerBuild(String commandArguments, Map<String, ? extends Object> buildArgs = [:]) {
+        String serializedBuildArgs = buildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
+
+        def cmd = ["docker build"]
+        if (platform) cmd << '--platform=' + platform
+        cmd << commandArguments
+        cmd << serializedBuildArgs
+
+        def finalCmd = cmd.join(' ').trim()
+        return execute(finalCmd, false, true, true)
     }
 
     String execute(String command,

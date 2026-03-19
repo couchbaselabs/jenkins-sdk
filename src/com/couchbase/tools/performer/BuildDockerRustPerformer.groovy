@@ -23,15 +23,19 @@ class BuildDockerRustPerformer {
                     TagProcessor.processTags(new File(imp.currentDir()), build, Optional.of(Pattern.compile(".*\\.rs")))
                 }
                 if (!onlySource) {
+                    Map<String, String> dockerBuildArgs = [:]
+
                     if (build instanceof BuildMain) {
-                        imp.execute("docker build -f performers/rust/Dockerfile -t $imageName .", false, true, true)
+                        // no extra build args
                     }
                     else if (build instanceof HasSha) {
-                        imp.execute("docker build -f performers/rust/Dockerfile -t $imageName --build-arg SDK_SHA=${build.sha()} .", false, true, true)
+                        dockerBuildArgs.put('SDK_SHA', build.sha())
                     }
                     else if (build instanceof HasVersion) {
-                        imp.execute("docker build -f performers/rust/Dockerfile -t $imageName --build-arg SDK_TAG=v${build.version()} .", false, true, true)
+                        dockerBuildArgs.put('SDK_TAG', build.version())
                     }
+
+                    imp.dockerBuild("-f performers/rust/Dockerfile -t $imageName .", dockerBuildArgs)
                 }
             }
         }
