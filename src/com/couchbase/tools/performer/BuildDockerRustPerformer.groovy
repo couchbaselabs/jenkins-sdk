@@ -32,7 +32,7 @@ class BuildDockerRustPerformer {
                         dockerBuildArgs.put('SDK_SHA', build.sha())
                     }
                     else if (build instanceof HasVersion) {
-                        dockerBuildArgs.put('SDK_TAG', build.version())
+                        dockerBuildArgs.put('SDK_TAG', 'v' + build.version())
                     }
 
                     imp.dockerBuild("-f performers/rust/Dockerfile -t $imageName .", dockerBuildArgs)
