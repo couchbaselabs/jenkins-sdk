@@ -36,6 +36,14 @@ class BuildDockerDotNetPerformer {
                 }
                 dockerBuildArgs.put('FIT_DOTNET_VERSION', dotnetVersion)
 
+                // The external Transactions project was removed between SDK 3.9.0 and 3.9.1, but was deprecated since 3.6.6.
+                // If we're building for a version below 3.6.6, we need to use the backup .sln which includes the external
+                // project and references.  
+                // For versions above 3.6.6, we can just use the normal .sln which doesn't include the external project.
+                if (build instanceof HasVersion && build.implementationVersion().isBelow(ImplementationVersion.from("3.6.6"))){
+                    imp.copyFile('transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/ExternalCouchbaseTransactions.sln.bak', 'transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Couchbase.Transactions.FitPerformer.sln')
+                }
+
                 if (build instanceof BuildMain) {
                     // no extra build args
                 }
