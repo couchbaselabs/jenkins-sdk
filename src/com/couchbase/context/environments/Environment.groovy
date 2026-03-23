@@ -63,6 +63,31 @@ class Environment {
         log("Deleted directory ${path}")
     }
 
+    void copyFile(String source, String destination) {
+        String fullSource
+        String fullDestination
+
+        if (workingDirectory.isEmpty()) {
+            fullSource = initialDir + File.separator + source
+            fullDestination = initialDir + File.separator + destination
+        }
+        else {
+            fullSource = workingDirectory.peek().getAbsolutePath() + File.separator + source
+            fullDestination = workingDirectory.peek().getAbsolutePath() + File.separator + destination
+        }
+
+        def sourceFile = new File(fullSource)
+        def destFile = new File(fullDestination)
+
+        sourceFile.withInputStream { input ->
+            destFile.withOutputStream { output ->
+                output << input
+            }
+        }
+
+        log("Copied file from ${source} to ${destination}")
+    }
+
     String currentDir() {
         if (workingDirectory.isEmpty()) {
             return initialDir
