@@ -92,3 +92,10 @@ task listSdkVersions(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "com.couchbase.tools.versions.ListSdkVersions"
 }
+
+task listSnapshotVersions(type: JavaExec) {
+    group = "Execution"
+    description = "List latest snapshot versions for all SDKs"
+    classpath = sourceSets.main.runtimeClasspath
+    main = "com.couchbase.tools.versions.ListSnapshotVersions"
+}
