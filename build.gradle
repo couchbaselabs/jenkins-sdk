@@ -99,3 +99,14 @@ task listSnapshotVersions(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "com.couchbase.tools.versions.ListSnapshotVersions"
 }
+
+task countRuns(type: JavaExec) {
+    group = "Execution"
+    description = "Analyse a FIT perf config YAML and write an HTML run-count report. Pass -Pconfig=<path> [-Poutput=<path>]"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.couchbase.perf.shared.main.CountRuns"
+    args = [
+        project.findProperty('config') ?: 'config/job-config.yaml',
+        project.findProperty('output') ?: 'run-count-report.html',
+    ]
+}

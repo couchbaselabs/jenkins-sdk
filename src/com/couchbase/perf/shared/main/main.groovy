@@ -62,8 +62,8 @@ class Execute {
         return get.getInputStream().getText()
     }
 
-    static void modifyConfig(StageContext ctx, PerfConfig config) {
-        List< PerfConfig.Implementation> implementationsToAdd = new ArrayList<>()
+    static void modifyConfigImplementations(StageContext ctx, PerfConfig config) {
+        List<PerfConfig.Implementation> implementationsToAdd = new ArrayList<>()
 
         config.matrix.implementations.forEach(implementation -> {
             if (implementation.version() == "main" || implementation.version() == "master") {
@@ -170,7 +170,9 @@ class Execute {
             config.matrix.implementations.addAll(implementationsToAdd)
         }
         ctx.env.log("Added ${implementationsToAdd} snapshot or range versions")
+    }
 
+    static void modifyConfigClusters(StageContext ctx, PerfConfig config) {
         config.matrix.clusters.forEach(cluster -> {
 
             String hostnameRest = cluster.hostname_rest
@@ -219,6 +221,11 @@ class Execute {
                 throw err
             }
         })
+    }
+
+    static void modifyConfig(StageContext ctx, PerfConfig config) {
+        modifyConfigImplementations(ctx, config)
+        modifyConfigClusters(ctx, config)
     }
 
     static Map<PerfConfig.Cluster, List<Run>> parseConfig2(StageContext ctx, List<RunFromDb> fromDb) {
