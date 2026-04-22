@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+        classpath 'com.gradleup.shadow:shadow-gradle-plugin:8.3.10'
     }
 
 }
@@ -19,7 +19,7 @@ java {
     }
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.gradleup.shadow'
 
 group 'org.example'
 version '1.0-SNAPSHOT'
