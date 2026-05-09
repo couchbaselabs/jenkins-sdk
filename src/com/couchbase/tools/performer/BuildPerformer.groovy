@@ -79,7 +79,9 @@ class BuildPerformer {
                                                 Sdk.PYTHON_ANALYTICS,
                                                 Sdk.RUST,
                                                 Sdk.PYTHON_COLUMNAR,
-                                                Sdk.NODE_COLUMNAR]
+                                                Sdk.NODE_COLUMNAR,
+                                                Sdk.DOTNET,
+                                                Sdk.DOTNET_ANALYTICS]
             if (!(sdk in sdksWithBuildArgs)) {
                 logger.severe("The docker-build-args parameter cannot be set for the ${sdk.name()} SDK.")
                 System.exit(-1)
@@ -217,7 +219,7 @@ class BuildPerformer {
                 } else if (sdk == Sdk.RUBY) {
                     BuildDockerRubyPerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
                 } else if (sdk == Sdk.DOTNET) { // "dotnet" alias to support test-driver CI job
-                    BuildDockerDotNetPerformer.build(env, dir, vers, imageName, onlySource)
+                    BuildDockerDotNetPerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
                 } else if (sdk == Sdk.NODE) {
                     BuildDockerNodePerformer.build(env, dir, vers, imageName, onlySource)
                 } else if (sdk == Sdk.RUST) {
@@ -235,7 +237,7 @@ class BuildPerformer {
                 } else if (sdk == Sdk.NODE_ANALYTICS) {
                     BuildDockerAnalyticsNodePerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
                 } else if (sdk == Sdk.DOTNET_ANALYTICS) {
-                    BuildDockerAnalyticsDotNetPerformer.build(env, dir, vers, imageName, onlySource)
+                    BuildDockerAnalyticsDotNetPerformer.build(env, dir, vers, imageName, onlySource, dockerBuildArgs)
                 } else {
                     logger.severe("Do not yet know how to build " + sdkRaw)
                 }

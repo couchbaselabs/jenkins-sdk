@@ -12,7 +12,7 @@ class BuildDockerDotNetPerformer {
      * @param path absolute path to above 'transactions-fit-performer'
      * @param build what to build
      */
-    static void build(Environment imp, String path, VersionToBuild build, String imageName, boolean onlySource = false) {
+    static void build(Environment imp, String path, VersionToBuild build, String imageName, boolean onlySource = false, Map<String, String> extraDockerBuildArgs = [:]) {
         imp.log("Building .NET ${build}")
 
         // Build context needs to be perf-sdk as we need the .proto files
@@ -26,6 +26,9 @@ class BuildDockerDotNetPerformer {
             }
             if (!onlySource) {
                 Map<String, String> dockerBuildArgs = [:]
+                if (extraDockerBuildArgs) {
+                    dockerBuildArgs.putAll(extraDockerBuildArgs)
+                }
 
                 var dotnetVersion = '10.0'
                 if (build instanceof HasVersion && build.implementationVersion().isBelow(ImplementationVersion.from("3.8.2"))){
@@ -46,7 +49,7 @@ class BuildDockerDotNetPerformer {
                 if (build instanceof BuildMain) {
                     // no extra build args
                 }
-                else if (build instanceof BuildGerrit) {
+                else if (build instanceof HasGerrit) {
                     dockerBuildArgs.put('BUILD_GERRIT', build.gerrit())
                 }
                 else if (build instanceof HasSha) {
