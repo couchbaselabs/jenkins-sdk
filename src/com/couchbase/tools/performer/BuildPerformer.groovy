@@ -78,6 +78,7 @@ class BuildPerformer {
                                                 Sdk.GO_COLUMNAR,
                                                 Sdk.PYTHON_ANALYTICS,
                                                 Sdk.RUST,
+                                                Sdk.PYTHON_COLUMNAR,
                                                 Sdk.NODE_COLUMNAR,
                                                 Sdk.DOTNET,
                                                 Sdk.DOTNET_ANALYTICS]
