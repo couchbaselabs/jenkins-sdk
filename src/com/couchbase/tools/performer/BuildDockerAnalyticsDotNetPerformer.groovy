@@ -20,7 +20,8 @@ class BuildDockerAnalyticsDotNetPerformer {
             String path,
             VersionToBuild build,
             String imageName,
-            boolean onlySource = false
+            boolean onlySource = false,
+            Map<String, String> extraDockerBuildArgs = [:]
     ) {
         env.log("Building analytics-dotnet ${build}")
 
@@ -37,6 +38,10 @@ class BuildDockerAnalyticsDotNetPerformer {
                 "FIT_DOTNET_VERSION": dotnetVersion,
                 "SDK_GIT_REV"       : gitRev(build),
         ]
+        if (extraDockerBuildArgs) {
+            dockerBuildArgs.putAll(extraDockerBuildArgs)
+        }
+        
         def serializedBuildArgs = dockerBuildArgs.collect((k, v) -> "--build-arg $k=$v").join(" ")
 
         env.dirAbsolute(path) {
