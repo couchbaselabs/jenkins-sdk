@@ -1,6 +1,6 @@
 package com.couchbase.perf.sdk.stages
 
-
+import com.couchbase.perf.shared.config.PerfConfig.Implementation
 import com.couchbase.stages.Stage
 import groovy.transform.CompileStatic
 import com.couchbase.context.StageContext
@@ -29,6 +29,14 @@ class InitialiseSDKPerformer extends Stage {
         return "Init performer $impl"
     }
 
+    private String prebuiltImageName(Implementation sdk) {
+        // This will be available soon, but currently requires login
+//        if (!sdk.isSnapshot) {
+//            return "ghcr.io/couchbaselabs/${sdk.language.toLowerCase()}-fit-performer:${sdk.version}"
+//        }
+        return null
+    }
+
     @Override
     List<Stage> stagesPre(StageContext ctx) {
         if (impl.port != null) {
@@ -36,12 +44,14 @@ class InitialiseSDKPerformer extends Stage {
             return []
         }
         else {
-            if (impl.language in ["Java", "Scala", "Kotlin"]) {
+            String prebuiltImage = prebuiltImageName(impl)
+            if (prebuiltImage != null) {
+                return produceStages(ctx, null, prebuiltImage)
+            } else if (impl.language in ["Java", "Scala", "Kotlin"]) {
                 def stage1 = new BuildDockerJVMSDKPerformer(impl.language.toLowerCase(), impl.version())
                 imageName = stage1.imageName
                 return produceStages(ctx, stage1, stage1.getImageName())
-            }
-            else if (impl.language == ".NET") {
+            } else if (impl.language == ".NET") {
                 def stage1 = new BuildDockerDotNetSDKPerformer(impl.version(), impl.sha)
                 imageName = stage1.imageName
                 return produceStages(ctx, stage1, stage1.getImageName())
@@ -85,7 +95,7 @@ class InitialiseSDKPerformer extends Stage {
     List<Stage> produceStages(StageContext ctx, Stage stage1, String imageName){
         List<Stage> stages = []
 
-        if (!ctx.skipPerformerDockerBuild()) {
+        if (!ctx.skipPerformerDockerBuild() && stage1 != null) {
             stages.add(stage1)
         }
 
