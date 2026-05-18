@@ -63,6 +63,8 @@ class Execute {
         return get.getInputStream().getText()
     }
 
+    // Takes the raw input list of SDK versions to tests ("implementations") from the config, e.g. "3.X.0", and
+    // turns those into real SDK versions.
     static void modifyConfigImplementations(StageContext ctx, PerfConfig config) {
         List<PerfConfig.Implementation> implementationsToAdd = new ArrayList<>()
 
@@ -177,6 +179,11 @@ class Execute {
         config.matrix.clusters.forEach(cluster -> {
 
             String hostnameRest = cluster.hostname_rest
+
+            if (hostnameRest == null) {
+                throw new Exception("No hostname_rest provided for cluster in config")
+            }
+
             String adminUsername = "Administrator"
             String adminPassword = "password"
 
@@ -184,7 +191,7 @@ class Execute {
                 var resp1 = getContents(hostnameRest + "/pools/default", adminUsername, adminPassword)
                 var resp2 = getContents(hostnameRest + "/pools", adminUsername, adminPassword)
 
-                ctx.env.log("/pools/default: ${resp1}")
+                ctx.env.log("Successfully connected to cluster on ${hostnameRest} and got /pools/default: ${resp1}")
                 ctx.env.log("/pools: ${resp2}")
 
                 def jsonSlurper = new JsonSlurper()

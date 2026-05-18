@@ -21,7 +21,11 @@ class RunSDKDriver extends Stage {
 
     @Override
     String name() {
-        return "Run for ${stageOutput.outputFilenameAbs()}"
+        return "Run: ${dockerStr()}"
+    }
+
+    private String dockerStr() {
+        return "docker run --rm --network perf -v ${stageOutput.outputFilenameAbs()}:/app/run-config.yaml driver /app/run-config.yaml"
     }
 
     @CompileDynamic
@@ -29,7 +33,7 @@ class RunSDKDriver extends Stage {
     void executeImpl(StageContext ctx) {
         // Make Docker happy on Windows
         def source = stageOutput.outputFilenameAbs()//.replace('\\', '/')
-        ctx.env.execute("${ctx.env.isWindows() || ctx.env.isMacOS() ? "" : "timeout 24h "}docker run --rm --network perf -v ${source}:/app/run-config.yaml driver /app/run-config.yaml",
+        ctx.env.execute("${ctx.env.isWindows() || ctx.env.isMacOS() ? "" : "timeout 24h "}${dockerStr()}",
             false, false, true)
     }
 }

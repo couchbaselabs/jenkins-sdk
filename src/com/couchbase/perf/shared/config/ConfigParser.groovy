@@ -269,7 +269,7 @@ class ConfigParser {
                     var perms = calculateVariablePermutations(ctx, variablesThatApply)
                     perms.forEach(perm -> {
                         // ctx.env.log("Potential permuations (not all will be run): ${config.matrix.clusters.size()} clusters * ${config.matrix.implementations.size()} implementations * ${config.matrix.workloads.size()} workloads * ${perms.size()} variable permuations")
-                        ctx.env.log("${cluster.connection_string_driver} ${impl} ${workload} ${perm}")
+                        ctx.env.log("Found a potential run: ${cluster.connection_string_driver} ${impl} ${workload} ${perm}")
                         workloadCount += 1
                     })
                 }
