@@ -311,7 +311,27 @@ class Environment {
      */
     @CompileDynamic
     String sourceDirAbsolute() {
-        return config.servers.driver.source
+        String source = config.servers.driver.source
+        File sourceDir = new File(source)
+
+        if (!sourceDir.isDirectory()) {
+            throw new IllegalStateException(
+                    "Source directory '${source}' (from config servers.driver.source) does not exist or is not a directory. " +
+                    "Set it to the directory that contains the 'transactions-fit-performer' folder.")
+        }
+
+        List<String> required = ["transactions-fit-performer", "jenkins-sdk"]
+        List<String> missing = required.findAll { !new File(sourceDir, it).isDirectory() }
+
+        if (!missing.isEmpty()) {
+            throw new IllegalStateException(
+                    "Source directory '${source}' (from config servers.driver.source) is missing required " +
+                    "${missing.size() == 1 ? 'folder' : 'folders'}: ${missing.join(', ')}. " +
+                    "Expected these to exist directly under it. " +
+                    "If testing the JVM SDK, 'couchbase-jvm-clients' must also be present.")
+        }
+
+        return source
     }
 
     // Runs the closure inside the source directory
