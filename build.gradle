@@ -65,6 +65,16 @@ dependencies {
 }
 
 
+task fitPerf(type: JavaExec) {
+    group = "Execution"
+    description = "Run FIT/PERF"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.couchbase.perf.shared.main.Execute"
+    if (project.hasProperty('args')) {
+        args = project.property('args').toString().split('\\s+').findAll { it }
+    }
+}
+
 task tags(type: JavaExec) {
     group = "Execution"
     description = "Run the TagsProcessor tool"

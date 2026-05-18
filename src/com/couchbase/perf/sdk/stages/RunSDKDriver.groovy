@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import com.couchbase.context.StageContext
 
 /**
- * Runs the driver and waits for the result.
+ * Runs the FIT/PERF driver and waits for the result.
  */
 @CompileStatic
 class RunSDKDriver extends Stage {

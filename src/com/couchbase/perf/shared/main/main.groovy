@@ -37,6 +37,7 @@ import static com.couchbase.versions.Versions.versions
 import static java.util.stream.Collectors.groupingBy
 
 
+// The main FIT/PERF 'engine'.
 class Execute {
     static void jcPrep(StageContext ctx, String[] args){
         //Get timescaledb password from jenkins credential
