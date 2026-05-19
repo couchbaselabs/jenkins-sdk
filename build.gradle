@@ -110,6 +110,23 @@ task listSnapshotVersions(type: JavaExec) {
     main = "com.couchbase.tools.versions.ListSnapshotVersions"
 }
 
+task listDockerContainers(type: JavaExec) {
+    group = "Execution"
+    description = "List all metadata for every container version of a GHCR package. Pass -Purl=<ghcr-url>[,<ghcr-url>...] [-Pjson] [-Pcompact] [-Plimit=N]. Requires GITHUB_TOKEN env var (read:packages scope)."
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.couchbase.tools.docker.ListDockerContainers"
+    args = ['-u', project.findProperty('url') ?: '']
+    if (project.hasProperty('json')) {
+        args += '--json'
+    }
+    if (project.hasProperty('compact')) {
+        args += '--compact'
+    }
+    if (project.hasProperty('limit')) {
+        args += ['--limit', project.property('limit').toString()]
+    }
+}
+
 task countRuns(type: JavaExec) {
     group = "Execution"
     description = "Analyse a FIT perf config YAML and write an HTML run-count report. Pass -Pconfig=<path> [-Poutput=<path>]"
