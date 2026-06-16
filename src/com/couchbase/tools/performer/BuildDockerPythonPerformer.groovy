@@ -30,35 +30,20 @@ class BuildDockerPythonPerformer {
         imp.dirAbsolute(path) {
             imp.dir('transactions-fit-performer') {
                 imp.dir('performers/python') {
-                    writePythonRequirementsFile(imp, build)
                     TagProcessor.processTags(new File(imp.currentDir()), build, Optional.of(Pattern.compile(".*\\.py")))
+                }
+
+                if (build instanceof HasVersion) {
+                    dockerBuildArgs.put("BUILD_FROM_VERSION", build.version())
+                } else if (build instanceof BuildMain) {
+                    dockerBuildArgs.put("BUILD_FROM_REPO", 'MAIN')
+                } else if (build instanceof HasSha) {
+                    dockerBuildArgs.put("BUILD_FROM_REPO", build.sha())
                 }
 
                 if (!onlySource) {
                     imp.dockerBuild("-f ./performers/python/Dockerfile -t $imageName .", dockerBuildArgs)
                 }
-            }
-        }
-    }
-
-    private static void writePythonRequirementsFile(Environment imp, VersionToBuild build) {
-        def requirements = new File("${imp.currentDir()}/cb_requirement.txt")
-        def lines = requirements.readLines()
-        requirements.write("")
-
-        for (String line : lines) {
-            if ((line.contains("couchbase") && !line.contains("/")) || line.contains("github.com/couchbase/couchbase-python-client")) {
-                if (build instanceof HasSha) {
-                    requirements.append("git+https://github.com/couchbase/couchbase-python-client.git@${build.sha()}#egg=couchbase\n")
-                }
-                else if (build instanceof HasVersion) {
-                    requirements.append("couchbase==${build.version()}\n")
-                }
-                else if (build instanceof BuildMain) {
-                    requirements.append("git+https://github.com/couchbase/couchbase-python-client.git@master#egg=couchbase\n")
-                }
-            } else {
-                requirements.append(line + "\n")
             }
         }
     }
