@@ -27,8 +27,9 @@ class StartDockerImageCppSDKPerformer extends Stage {
 
     @Override
     void executeImpl(StageContext ctx) {
+        String logLevel = System.getenv("FIT_LOG_LEVEL") ?: "info"
         // -d so this will run in background
-        ctx.env.execute("${ctx.env.isWindows() || ctx.env.isMacOS() ? "" : "timeout 24h "}docker run --rm -d --network perf -p $port:8060 --name ${containerName} $imageName",
+        ctx.env.execute("${ctx.env.isWindows() || ctx.env.isMacOS() ? "" : "timeout 24h "}docker run --rm -d --network perf -e FIT_LOG_LEVEL=${logLevel} -p $port:8060 --name ${containerName} $imageName",
                 false, false, true)
         // Stream the logs in the background
         ctx.env.execute("docker logs --follow ${containerName}", false, false, true, true)
