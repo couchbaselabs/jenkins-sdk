@@ -30,11 +30,11 @@ class PrebuiltPerformerImage {
     }
 
     static String tag(Implementation impl) {
+        if (impl.isGerrit()) {
+            throw new IllegalArgumentException("Prebuilt FIT performer images are not supported for Gerrit changesets (${impl.version()}). Disable usePrebuiltImages to build from source.")
+        }
         if (impl.isMain() || impl.isSnapshot) {
             return "main"
-        }
-        if (impl.isGerrit()) {
-            return impl.version().replaceAll("[^A-Za-z0-9.]", "-")
         }
         return impl.version()
     }
