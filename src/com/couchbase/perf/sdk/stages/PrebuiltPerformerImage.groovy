@@ -16,7 +16,7 @@ class PrebuiltPerformerImage {
             "Go"    : "go",
             "Python": "python",
             "Node"  : "node",
-            "C++"   : "cpp",
+            "C++"   : "cxx",
             "Ruby"  : "ruby",
             "Rust"  : "rust",
     ]
