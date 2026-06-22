@@ -1,7 +1,10 @@
 package com.couchbase.perf.sdk.stages
 
 import com.couchbase.context.StageContext
+import com.couchbase.perf.shared.config.PerfConfig
 import com.couchbase.stages.Stage
+import groovy.json.JsonSlurper
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -9,9 +12,11 @@ class PullDockerImagePerformer extends Stage {
     private static final String REGISTRY = "ghcr.io"
 
     private final String imageName
+    private final PerfConfig.Implementation impl
 
-    PullDockerImagePerformer(String imageName) {
+    PullDockerImagePerformer(String imageName, PerfConfig.Implementation impl) {
         this.imageName = imageName
+        this.impl = impl
     }
 
     @Override
@@ -31,6 +36,27 @@ class PullDockerImagePerformer extends Stage {
         }
         login(ctx, REGISTRY, username, token)
         ctx.env.execute("docker pull ${imageName}", false, true, true)
+        impl.image = readImageMetadata(ctx)
+    }
+
+    @CompileDynamic
+    private Map<String, Object> readImageMetadata(StageContext ctx) {
+        def labels = new JsonSlurper().parseText(ctx.env.executeSimple("docker inspect ${imageName}"))[0]?.Config?.Labels
+        if (!(labels instanceof Map)) {
+            throw new RuntimeException("docker inspect ${imageName} returned no Config.Labels; cannot record performer image metadata")
+        }
+        // created is the performer build time and orders builds chronologically; the base-image build-date label must not be used.
+        def created = labels["org.opencontainers.image.created"]
+        if (created == null) {
+            throw new RuntimeException("Prebuilt image ${imageName} is missing the org.opencontainers.image.created label needed to order builds")
+        }
+        return [
+                "created" : created,
+                "pr"      : labels["com.couchbase.pr"],
+                "revision": labels["org.opencontainers.image.revision"],
+                "ciRun"   : labels["com.couchbase.github.actions.run"],
+                "source"  : labels["org.opencontainers.image.source"],
+        ]
     }
 
     private static void login(StageContext ctx, String registry, String username, String token) {

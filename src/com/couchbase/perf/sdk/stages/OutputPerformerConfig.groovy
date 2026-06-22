@@ -84,7 +84,8 @@ class OutputPerformerConfig extends Stage {
 
         def json = new JsonBuilder(gen)
         json {
-            impl impl
+            // Full result params: emit the curated impl block (with image metadata) that the driver persists to params.impl.
+            impl impl.toJson(false)
             connections {
                 cluster cluster.toJsonRaw(false)
 
