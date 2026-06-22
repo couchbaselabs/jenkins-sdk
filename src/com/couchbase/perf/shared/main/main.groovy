@@ -312,11 +312,11 @@ class Execute {
                 // Without this, get 'out of disk space' errors regularly
                 // Update: but, it appears to hang...
                 // performerRuns.add(new PruneDocker())
-                performerRuns.add(output)
 
                 clusterChildren.addAll(performerRuns)
-                // ScopedStage because we want to bring performer up, run driver, bring performer down
-                clusterChildren.add(new ScopedStage(performerStage, [new RunSDKDriver(output)],
+                // ScopedStage because we want to bring performer up, run driver, bring performer down.
+                // output is a child here (not before) so it runs after the performer pull has populated impl.image.
+                clusterChildren.add(new ScopedStage(performerStage, [output, new RunSDKDriver(output)],
                         (err) -> {
                             def jobName = "${performer.language} ${performer.version()}"
                             ctx.env.log("Job ${jobName} failed with err: ${err}")

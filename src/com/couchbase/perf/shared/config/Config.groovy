@@ -151,6 +151,9 @@ class PerfConfig {
         // True iff "snapshot" was the originally specified version
         boolean isSnapshot
 
+        // Curated OCI image-label metadata, set by PullDockerImagePerformer on the prebuilt path; null otherwise.
+        Map<String, Object> image
+
         Implementation() {}
 
         Implementation(String language, String version, Integer port, String sha = null, boolean isSnapshot = false) {
@@ -182,11 +185,16 @@ class PerfConfig {
         }
 
         @CompileDynamic
-        def toJson() {
-            return [
+        def toJson(boolean forDatabaseComparison) {
+            def out = [
                     "language": language,
                     "version" : version
             ]
+            // image is metadata only, excluded from the comparison key so run-matching/dedup stays stable.
+            if (!forDatabaseComparison && image != null) {
+                out.put("image", image)
+            }
+            return out
         }
     }
 }
@@ -325,7 +333,7 @@ class Run {
         // This is for comparison to the database, which isn't a 1:1 match to the config YAML, since some stuff
         // gets removed and flattened out to simplify the database JSON.  For example, no need to record GRPC settings.
         def out = gen.toJson([
-                "impl"    : impl.toJson(),
+                "impl"    : impl.toJson(true),
                 "vars"    : jsonVars,
                 "cluster" : cluster.toJsonRaw(true),
                 "workload": workload.toJson(),

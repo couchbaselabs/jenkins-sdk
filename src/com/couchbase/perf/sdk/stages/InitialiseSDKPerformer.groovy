@@ -89,7 +89,7 @@ class InitialiseSDKPerformer extends Stage {
         List<Stage> stages = []
 
         if (stage1 == null) {
-            stages.add(new PullDockerImagePerformer(imageName))
+            stages.add(new PullDockerImagePerformer(imageName, impl))
         }
         else if (!ctx.skipPerformerDockerBuild()) {
             stages.add(stage1)
