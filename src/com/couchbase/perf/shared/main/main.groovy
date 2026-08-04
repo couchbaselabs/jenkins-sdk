@@ -17,23 +17,13 @@ import com.couchbase.perf.shared.stages.PruneDocker
 import com.couchbase.perf.shared.stages.StopDockerContainer
 import com.couchbase.stages.*
 import com.couchbase.stages.servers.InitialiseCluster
-import com.couchbase.versions.CppVersions
-import com.couchbase.versions.DotNetVersions
-import com.couchbase.versions.GoVersions
-import com.couchbase.versions.ImplementationVersion
-import com.couchbase.versions.JVMVersions
-import com.couchbase.versions.PythonVersions
-import com.couchbase.versions.NodeVersions
-import com.couchbase.versions.RubyVersions
-import com.couchbase.versions.RustVersions
+import com.couchbase.versions.ContainerRegistryVersions
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.yaml.YamlSlurper
 
 import java.util.stream.Collectors
 
-import static com.couchbase.versions.Versions.jvmVersions
-import static com.couchbase.versions.Versions.versions
 import static java.util.stream.Collectors.groupingBy
 
 
@@ -63,116 +53,18 @@ class Execute {
         return get.getInputStream().getText()
     }
 
-    // Takes the raw input list of SDK versions to tests ("implementations") from the config, e.g. "3.X.0", and
-    // turns those into real SDK versions.
+    // Takes the raw input list of SDKs to test ("implementations") from the config - just a
+    // language, e.g. "C++" - and expands each into one concrete Implementation per version
+    // currently published to ghcr.io/couchbase/<sdk>-fit-performer. The registry is the sole
+    // source of truth for which versions exist to test.
     static void modifyConfigImplementations(StageContext ctx, PerfConfig config) {
         List<PerfConfig.Implementation> implementationsToAdd = new ArrayList<>()
-
-        config.matrix.implementations.forEach(implementation -> {
-            if (implementation.version() == "main" || implementation.version() == "master") {
-                // Useful for local development - just use whatever is present.
-                implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, "main", null, null, false))
-            }
-            else if (implementation.version() == "snapshot") {
-                if (implementation.language == "Java") {
-                    try {
-                        def snapshot = JVMVersions.getLatestSnapshotBuild("java-client")
-                        ctx.env.log("Found snapshot build for Java: ${snapshot}")
-                        implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.toString(), null, null, true))
-                    } catch (Throwable err) {
-                        ctx.env.log("Skipping Java snapshot due to error: ${err}")
-                    }
-                }
-                else if (implementation.language == "Kotlin") {
-                    try {
-                        def snapshot = JVMVersions.getLatestSnapshotBuild("kotlin-client")
-                        ctx.env.log("Found snapshot build for Kotlin: ${snapshot}")
-                        implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.toString(), null, null, true))
-                    } catch (Throwable err) {
-                        ctx.env.log("Skipping Kotlin snapshot due to error: ${err}")
-                    }
-                }
-                else if (implementation.language == "Scala") {
-                    try {
-                        def snapshot = JVMVersions.getLatestSnapshotBuild("scala-client_2.12")
-                        ctx.env.log("Found snapshot build for Scala: ${snapshot}")
-                        implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.toString(), null, null, true))
-                    } catch (Throwable err) {
-                        ctx.env.log("Skipping Scala snapshot due to error: ${err}")
-                    }
-                }
-                else if (implementation.language == ".NET") {
-                    def snapshot = DotNetVersions.getLatestSnapshot()
-                    ctx.env.log("Found latest snapshot for Dotnet: ${snapshot}")
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.version.toString(), null, snapshot.sha, true))
-                }
-                else if (implementation.language == "Go") {
-                    def snapshot = GoVersions.getLatestGoModEntry()
-                    if (snapshot == null) {
-                        ctx.env.log("Skipping go snapshot")
-                    } else {
-                        ctx.env.log("Found gomod entry for Go: ${snapshot}")
-                        implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot, null, null, true))
-                    }
-                }
-                else if (implementation.language == "Python") {
-                    def snapshot = PythonVersions.getLatestSnapshot()
-                    ctx.env.log("Found latest snapshot for Python: ${snapshot}")
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.version.toString(), null, snapshot.sha, true))
-                }
-                else if (implementation.language == "Node") {
-                    def snapshot = NodeVersions.getLatestSnapshot()
-                    ctx.env.log("Found latest snapshot for Node: ${snapshot}")
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.version.toString(), null, snapshot.sha, true))
-                }
-                else if (implementation.language == "C++") {
-                    def snapshot = CppVersions.getLatestSnapshot()
-                    ctx.env.log("Found latest snapshot for C++: ${snapshot}")
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.version.toString(), null, snapshot.sha, true))
-                }
-                else if (implementation.language == "Ruby") {
-                    def snapshot = RubyVersions.getLatestSnapshot()
-                    ctx.env.log("Found latest snapshot for Ruby: ${snapshot}")
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.version.toString(), null, snapshot.sha, true))
-                }
-                else if (implementation.language == "Rust") {
-                    def snapshot = RustVersions.getLatestSnapshot()
-                    ctx.env.log("Found latest snapshot for Rust: ${snapshot}")
-                    implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, snapshot.version.toString(), null, snapshot.sha, true))
-                }
-                else {
-                    throw new UnsupportedOperationException("Cannot support snapshot builds with language ${implementation.language} yet")
-                }
-            }
-            else if (implementation.version().contains('X')) {
-                if (implementation.language == "Java") implementationsToAdd.addAll(jvmVersions(ctx.env, implementation, "java-client"))
-                else if (implementation.language == "Scala") implementationsToAdd.addAll(jvmVersions(ctx.env, implementation, "scala-client_2.12"))
-                else if (implementation.language == "Kotlin") implementationsToAdd.addAll(jvmVersions(ctx.env, implementation, "kotlin-client"))
-                else if (implementation.language == ".NET") implementationsToAdd.addAll(versions(ctx.env, implementation, ".NET", DotNetVersions.allReleases))
-                else if (implementation.language == "Go") implementationsToAdd.addAll(versions(ctx.env, implementation, "Go", GoVersions.allReleases))
-                else if (implementation.language == "Python") implementationsToAdd.addAll(versions(ctx.env, implementation, "Python", PythonVersions.allReleases))
-                else if (implementation.language == "Node") implementationsToAdd.addAll(versions(ctx.env, implementation, "Node", NodeVersions.allReleases))
-                else if (implementation.language == "C++") implementationsToAdd.addAll(versions(ctx.env, implementation, "C++", CppVersions.allReleases))
-                else if (implementation.language == "Ruby") implementationsToAdd.addAll(versions(ctx.env, implementation, "Ruby", RubyVersions.allReleases))
-                else if (implementation.language == "Rust") implementationsToAdd.addAll(versions(ctx.env, implementation, "Rust", RustVersions.allReleases))
-                else {
-                    throw new UnsupportedOperationException("Cannot support snapshot builds with language ${implementation.language} yet")
-                }
-            }
-            else if (implementation.isGerrit()) {
-                if (!["Java", "Scala", "Kotlin"].contains(implementation.language)) {
-                    throw new UnsupportedOperationException("Gerrit builds not currently supported for " + implementation.language)
-                }
-                implementationsToAdd.add(new PerfConfig.Implementation(implementation.language, implementation.version(), null, null))
-            }
-            // If adding another special type here, remember to add it to removeIf below
-        })
-
-        config.matrix.implementations.removeIf(v -> v.version() == "snapshot" || v.version().contains('X') || v.isGerrit())
-        if (implementationsToAdd != null) {
-            config.matrix.implementations.addAll(implementationsToAdd)
-        }
-        ctx.env.log("Added ${implementationsToAdd} snapshot or range versions")
+        config.matrix.implementations.forEach(implementation ->
+                implementationsToAdd.addAll(ContainerRegistryVersions.allVersions(ctx.env, implementation.language))
+        )
+        config.matrix.implementations.clear()
+        config.matrix.implementations.addAll(implementationsToAdd)
+        ctx.env.log("Discovered ${implementationsToAdd.size()} performer versions to test from the container registry")
     }
 
     static void modifyConfigClusters(StageContext ctx, PerfConfig config) {
