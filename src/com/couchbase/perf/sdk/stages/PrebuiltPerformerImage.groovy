@@ -9,7 +9,7 @@ class PrebuiltPerformerImage {
     private static final String ORG = "couchbase"
 
     // Python and Node do not yet have prebuilt images
-    private static final Map<String, String> SDK_NAMES = [
+    static final Map<String, String> SDK_NAMES = [
             "Java"  : "java",
             "Scala" : "scala",
             "Kotlin": "kotlin",
