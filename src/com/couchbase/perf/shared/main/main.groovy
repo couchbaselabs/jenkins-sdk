@@ -40,11 +40,11 @@ import static java.util.stream.Collectors.groupingBy
 // The main FIT/PERF 'engine'.
 class Execute {
     static void jcPrep(StageContext ctx, String[] args){
-        //Get timescaledb password from jenkins credential
-        String dbPwd = ""
-        if (args.length > 0) {
-            dbPwd = args[0]
-            ctx.jc.database.password = args[0]
+        String envPassword = System.getenv("FIT_PERF_DB_PASSWORD")
+        if (envPassword != null && !envPassword.isEmpty()) {
+            ctx.jc.database.password = envPassword
+        } else if (args.length > 0) {
+            throw new RuntimeException("Database password must be provided via envvar (FIT_PERF_DB_PASSWORD) - providing it in config file is no longer supported")
         }
     }
 
