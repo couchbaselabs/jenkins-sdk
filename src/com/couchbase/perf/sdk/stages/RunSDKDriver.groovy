@@ -25,7 +25,7 @@ class RunSDKDriver extends Stage {
     }
 
     private String dockerStr() {
-        return "docker run --rm --network perf -v ${stageOutput.outputFilenameAbs()}:/app/run-config.yaml driver /app/run-config.yaml"
+        return "docker run --rm --network perf -e FIT_PERF_DB_PASSWORD -v ${stageOutput.outputFilenameAbs()}:/app/run-config.yaml driver /app/run-config.yaml"
     }
 
     @CompileDynamic
