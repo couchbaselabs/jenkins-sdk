@@ -34,47 +34,25 @@ class InitialiseSDKPerformer extends Stage {
             // Nothing to do
             return []
         }
-        else if (ctx.usePrebuiltImages()) {
+        else if (PrebuiltPerformerImage.isSupported(impl)) {
             String prebuiltImage = PrebuiltPerformerImage.imageName(impl)
             imageName = prebuiltImage
             return produceStages(ctx, null, prebuiltImage)
         }
+        // Python and Node don't publish prebuilt performer images, so they alone are still built from
+        // source here.  Every other SDK runs exclusively from its prebuilt image.
+        else if (impl.language == "Python") {
+            def stage1 = new BuildDockerPythonSDKPerformer(impl.version(), impl.sha)
+            imageName = stage1.imageName
+            return produceStages(ctx, stage1, stage1.getImageName())
+        }
+        else if (impl.language == "Node") {
+            def stage1 = new BuildDockerNodeSDKPerformer(impl.version(), impl.sha)
+            imageName = stage1.imageName
+            return produceStages(ctx, stage1, stage1.getImageName())
+        }
         else {
-            if (impl.language in ["Java", "Scala", "Kotlin"]) {
-                def stage1 = new BuildDockerJVMSDKPerformer(impl.language.toLowerCase(), impl.version())
-                imageName = stage1.imageName
-                return produceStages(ctx, stage1, stage1.getImageName())
-            } else if (impl.language == ".NET") {
-                def stage1 = new BuildDockerDotNetSDKPerformer(impl.version(), impl.sha)
-                imageName = stage1.imageName
-                return produceStages(ctx, stage1, stage1.getImageName())
-            } else if (impl.language == "Go"){
-                def stage1 = new BuildDockerGoSDKPerformer(impl.version())
-                imageName = stage1.imageName
-                return produceStages(ctx, stage1, stage1.getImageName())
-            } else if (impl.language == "Python"){
-                def stage1 = new BuildDockerPythonSDKPerformer(impl.version(), impl.sha)
-                imageName = stage1.imageName
-                return produceStages(ctx, stage1, stage1.getImageName())
-            } else if (impl.language == "Node") {
-                def stage1 = new BuildDockerNodeSDKPerformer(impl.version(), impl.sha)
-                imageName = stage1.imageName
-                return produceStages(ctx, stage1, stage1.getImageName())
-            } else if (impl.language == "C++") {
-                def stage1 = new BuildDockerCppSDKPerformer(impl.version(), impl.sha)
-                imageName = stage1.imageName
-                return produceStages(ctx, stage1, stage1.getImageName())
-            } else if (impl.language == "Ruby") {
-                def stage1 = new BuildDockerRubySDKPerformer(impl.version(), impl.sha)
-                imageName = stage1.imageName
-                return produceStages(ctx, stage1, stage1.getImageName())
-            } else if (impl.language == "Rust") {
-                def stage1 = new BuildDockerRustSDKPerformer(impl.version(), impl.sha)
-                imageName = stage1.imageName
-                return produceStages(ctx, stage1, stage1.getImageName())
-            } else {
-                throw new IllegalArgumentException("Unknown performer ${impl.language}")
-            }
+            throw new IllegalArgumentException("Unknown performer ${impl.language}")
         }
     }
 

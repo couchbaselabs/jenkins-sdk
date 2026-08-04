@@ -49,11 +49,6 @@ class StageContext {
     }
 
     @CompileDynamic
-    boolean usePrebuiltImages() {
-        return jc.variables.usePrebuiltImages
-    }
-
-    @CompileDynamic
     boolean stopOnFailure() {
         return jc.variables.stopOnFailure
     }
