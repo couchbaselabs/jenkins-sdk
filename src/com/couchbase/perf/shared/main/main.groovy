@@ -55,7 +55,7 @@ class Execute {
 
     // Takes the raw input list of SDKs to test ("implementations") from the config - just a
     // language, e.g. "C++" - and expands each into one concrete Implementation per version
-    // currently published to ghcr.io/couchbase/<sdk>-fit-performer. The registry is the sole
+    // currently published to ghcr.io/<owner>/<sdk>-fit-performer. The registry is the sole
     // source of truth for which versions exist to test.
     static void modifyConfigImplementations(StageContext ctx, PerfConfig config) {
         List<PerfConfig.Implementation> implementationsToAdd = new ArrayList<>()

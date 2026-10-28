@@ -9,12 +9,10 @@ import groovy.transform.CompileStatic
 
 /**
  * Discovers which versions of an SDK's performer to test by listing the tags
- * already published to ghcr.io/couchbase/<sdk>-fit-performer
+ * already published to ghcr.io/<owner>/<sdk>-fit-performer
  */
 @CompileStatic
 class ContainerRegistryVersions {
-    private static final String ORG = "couchbase"
-
     @CompileDynamic
     static List<PerfConfig.Implementation> allVersions(Environment env, String language) {
         String sdk = PrebuiltPerformerImage.SDK_NAMES.get(language)
@@ -24,6 +22,7 @@ class ContainerRegistryVersions {
                     "can't be discovered from the registry. Known SDKs: ${PrebuiltPerformerImage.SDK_NAMES.keySet().join(", ")}.")
         }
         String pkg = "${sdk}-fit-performer"
+        String owner = PrebuiltPerformerImage.owner(language)
 
         String token = System.getenv("GITHUB_TOKEN")
         if (token == null || token.trim().isEmpty()) {
@@ -31,7 +30,7 @@ class ContainerRegistryVersions {
                     "GITHUB_TOKEN environment variable is required to list published performer image versions from ghcr.io (needs read:packages scope).")
         }
 
-        def target = new GhcrClient.Target(owner: ORG, pkg: pkg)
+        def target = new GhcrClient.Target(owner: owner, pkg: pkg)
         List versionsFound = GhcrClient.fetchVersions(target, token)
 
         Set<String> tags = new LinkedHashSet<>()
@@ -58,7 +57,7 @@ class ContainerRegistryVersions {
 
         if (out.isEmpty()) {
             throw new RuntimeException(
-                    "No usable performer image tags found for ${language} (ghcr.io/${ORG}/${pkg}) - nothing to test.")
+                    "No usable performer image tags found for ${language} (ghcr.io/${owner}/${pkg}) - nothing to test.")
         }
         return out
     }
