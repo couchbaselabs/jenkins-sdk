@@ -50,13 +50,19 @@ class PullDockerImagePerformer extends Stage {
         if (created == null) {
             throw new RuntimeException("Prebuilt image ${imageName} is missing the org.opencontainers.image.created label needed to order builds")
         }
-        return [
+        Map<String, Object> out = [
                 "created" : created,
                 "pr"      : labels["com.couchbase.pr"],
                 "revision": labels["org.opencontainers.image.revision"],
                 "ciRun"   : labels["com.couchbase.github.actions.run"],
                 "source"  : labels["org.opencontainers.image.source"],
         ]
+        // Set by images that wrap the Java SDK, such as Quarkus
+        def sdkVersion = labels["com.couchbase.java-sdk.version"]
+        if (sdkVersion != null) {
+            out.put("sdkVersion", sdkVersion)
+        }
+        return out
     }
 
     private static void login(StageContext ctx, String registry, String username, String token) {
